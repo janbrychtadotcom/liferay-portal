@@ -296,6 +296,11 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getCommerceDiscountId() + "/discount-products?nestedFields=product";
 	}
 
+	public String getDiscountCPInstanceApiURL() throws PortalException {
+		return "/o/headless-commerce-admin-pricing/v2.0/discounts/" +
+			   getCommerceDiscountId() + "/discount-skus?nestedFields=sku";
+	}
+
 	public List<ClayDataSetActionDropdownItem>
 			getDiscountCPDefinitionClayDataSetActionDropdownItems()
 		throws PortalException {
@@ -315,6 +320,30 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 				"screenNavigationCategoryKey", "details"
 			).buildString(),
 			false);
+	}
+
+	public List<ClayDataSetActionDropdownItem>
+		getDiscountCPInstanceClayDataSetActionDropdownItems()
+		throws PortalException {
+//TODO: JB
+
+//		String t = PortletURLBuilder.create(
+//			PortletProviderUtil.getPortletURL(
+//				httpServletRequest, CPDefinition.class.getName(),
+//				PortletProvider.Action.MANAGE)
+//		).setMVCRenderCommandName(
+//			"/cp_definitions/edit_cp_definition"
+//		).setRedirect(
+//			commercePricingRequestHelper.getCurrentURL()
+//		).setParameter(
+//			"cpDefinitionId", "{sku.id}"
+//		).setParameter(
+//			"screenNavigationCategoryKey", "details"
+//		).buildString();
+//
+//		return getClayHeadlessDataSetActionTemplates(t, false);
+		return new ArrayList<>();
+
 	}
 
 	public CreationMenu getDiscountCreationMenu() throws Exception {

@@ -64,6 +64,7 @@ public class DiscountSkuDTOConverter
 				discountId = commerceDiscount.getCommerceDiscountId();
 				discountSkuId = commerceDiscountRel.getCommerceDiscountRelId();
 				skuId = cpInstance.getCPInstanceId();
+
 			}
 		};
 	}

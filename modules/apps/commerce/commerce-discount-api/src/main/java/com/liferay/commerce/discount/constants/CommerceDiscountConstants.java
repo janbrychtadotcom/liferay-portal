@@ -74,6 +74,8 @@ public class CommerceDiscountConstants {
 
 	public static final String TARGET_PRODUCTS = "products";
 
+	public static final String TARGET_SKU = "products-skus";
+
 	public static final String TARGET_SHIPPING = "shipping";
 
 	public static final String TARGET_SUBTOTAL = "subtotal";
