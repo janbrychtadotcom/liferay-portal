@@ -26,6 +26,7 @@ import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountChannel;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountProduct;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountProductGroup;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountRule;
+import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountSku;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceEntry;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceList;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.PriceListAccount;
@@ -52,6 +53,7 @@ import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountProduct
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountProductResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountRuleResource;
+import com.liferay.headless.commerce.admin.pricing.resource.v2_0.DiscountSkuResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceEntryResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListAccountGroupResource;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.PriceListAccountResource;
@@ -192,6 +194,14 @@ public class Query {
 
 		_discountRuleResourceComponentServiceObjects =
 			discountRuleResourceComponentServiceObjects;
+	}
+
+	public static void setDiscountSkuResourceComponentServiceObjects(
+		ComponentServiceObjects<DiscountSkuResource>
+			discountSkuResourceComponentServiceObjects) {
+
+		_discountSkuResourceComponentServiceObjects =
+			discountSkuResourceComponentServiceObjects;
 	}
 
 	public static void setPriceEntryResourceComponentServiceObjects(
@@ -860,6 +870,31 @@ public class Query {
 					Pagination.of(page, pageSize),
 					_sortsBiFunction.apply(
 						discountRuleResource, sortsString))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {discountIdDiscountSkus(filter: ___, id: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public DiscountSkuPage discountIdDiscountSkus(
+			@GraphQLName("id") Long id, @GraphQLName("search") String search,
+			@GraphQLName("filter") String filterString,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page,
+			@GraphQLName("sort") String sortsString)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource -> new DiscountSkuPage(
+				discountSkuResource.getDiscountIdDiscountSkusPage(
+					id, search,
+					_filterBiFunction.apply(discountSkuResource, filterString),
+					Pagination.of(page, pageSize),
+					_sortsBiFunction.apply(discountSkuResource, sortsString))));
 	}
 
 	/**
@@ -2729,6 +2764,39 @@ public class Query {
 
 	}
 
+	@GraphQLName("DiscountSkuPage")
+	public class DiscountSkuPage {
+
+		public DiscountSkuPage(Page discountSkuPage) {
+			actions = discountSkuPage.getActions();
+
+			items = discountSkuPage.getItems();
+			lastPage = discountSkuPage.getLastPage();
+			page = discountSkuPage.getPage();
+			pageSize = discountSkuPage.getPageSize();
+			totalCount = discountSkuPage.getTotalCount();
+		}
+
+		@GraphQLField
+		protected Map<String, Map> actions;
+
+		@GraphQLField
+		protected java.util.Collection<DiscountSku> items;
+
+		@GraphQLField
+		protected long lastPage;
+
+		@GraphQLField
+		protected long page;
+
+		@GraphQLField
+		protected long pageSize;
+
+		@GraphQLField
+		protected long totalCount;
+
+	}
+
 	@GraphQLName("PriceEntryPage")
 	public class PriceEntryPage {
 
@@ -3390,6 +3458,20 @@ public class Query {
 		discountRuleResource.setRoleLocalService(_roleLocalService);
 	}
 
+	private void _populateResourceContext(
+			DiscountSkuResource discountSkuResource)
+		throws Exception {
+
+		discountSkuResource.setContextAcceptLanguage(_acceptLanguage);
+		discountSkuResource.setContextCompany(_company);
+		discountSkuResource.setContextHttpServletRequest(_httpServletRequest);
+		discountSkuResource.setContextHttpServletResponse(_httpServletResponse);
+		discountSkuResource.setContextUriInfo(_uriInfo);
+		discountSkuResource.setContextUser(_user);
+		discountSkuResource.setGroupLocalService(_groupLocalService);
+		discountSkuResource.setRoleLocalService(_roleLocalService);
+	}
+
 	private void _populateResourceContext(PriceEntryResource priceEntryResource)
 		throws Exception {
 
@@ -3624,6 +3706,8 @@ public class Query {
 		_discountProductGroupResourceComponentServiceObjects;
 	private static ComponentServiceObjects<DiscountRuleResource>
 		_discountRuleResourceComponentServiceObjects;
+	private static ComponentServiceObjects<DiscountSkuResource>
+		_discountSkuResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceEntryResource>
 		_priceEntryResourceComponentServiceObjects;
 	private static ComponentServiceObjects<PriceListResource>

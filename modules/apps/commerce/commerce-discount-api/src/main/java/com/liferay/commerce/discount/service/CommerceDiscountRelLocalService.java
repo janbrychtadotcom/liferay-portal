@@ -304,6 +304,15 @@ public interface CommerceDiscountRelLocalService
 		long commerceDiscountId, String name, String languageId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscountRel> getCPInstancesByCommerceDiscountId(
+		long commerceDiscountId, String sku, String languageId, int start,
+		int end);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public int getCPInstancesByCommerceDiscountIdCount(
+		long commerceDiscountId, String sku);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public IndexableActionableDynamicQuery getIndexableActionableDynamicQuery();
 
 	/**

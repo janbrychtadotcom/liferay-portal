@@ -367,6 +367,21 @@ public class CommerceDiscountRelLocalServiceUtil {
 			commerceDiscountId, name, languageId);
 	}
 
+	public static List<CommerceDiscountRel> getCPInstancesByCommerceDiscountId(
+		long commerceDiscountId, String sku, String languageId, int start,
+		int end) {
+
+		return getService().getCPInstancesByCommerceDiscountId(
+			commerceDiscountId, sku, languageId, start, end);
+	}
+
+	public static int getCPInstancesByCommerceDiscountIdCount(
+		long commerceDiscountId, String sku) {
+
+		return getService().getCPInstancesByCommerceDiscountIdCount(
+			commerceDiscountId, sku);
+	}
+
 	public static
 		com.liferay.portal.kernel.dao.orm.IndexableActionableDynamicQuery
 			getIndexableActionableDynamicQuery() {
