@@ -41,24 +41,14 @@ public class CommerceDiscountCPInstanceClayTableDataSetDisplayView
 		ClayTableSchemaBuilder clayTableSchemaBuilder =
 			_clayTableSchemaBuilderFactory.create();
 
-		clayTableSchemaBuilder.addClayTableSchemaField("skuId", "id");
-		//clayTableSchemaBuilder.addClayTableSchemaField("cpInstance.sku", "sku");
-		//clayTableSchemaBuilder.addClayTableSchemaField("sku.sku", "sku");
-		//clayTableSchemaBuilder.addClayTableSchemaField("sku.productName.LANG", "product");
+		ClayTableSchemaField skuField =
+			clayTableSchemaBuilder.addClayTableSchemaField(
+				"sku.name", "sku");
 
-//		ClayTableSchemaField imageField =
-//			clayTableSchemaBuilder.addClayTableSchemaField(
-//				"product.thumbnail", StringPool.BLANK);
-//
-//		imageField.setContentRenderer("image");
+		skuField.setContentRenderer("actionLink");
 
-//		ClayTableSchemaField nameField =
-//			clayTableSchemaBuilder.addClayTableSchemaField(
-//				"product.name.LANG", "name");
-//
-//		nameField.setContentRenderer("actionLink");
-//
-//		clayTableSchemaBuilder.addClayTableSchemaField("product.sku", "sku");
+		clayTableSchemaBuilder.addClayTableSchemaField("productName.LANG", "product");
+
 
 		return clayTableSchemaBuilder.build();
 	}

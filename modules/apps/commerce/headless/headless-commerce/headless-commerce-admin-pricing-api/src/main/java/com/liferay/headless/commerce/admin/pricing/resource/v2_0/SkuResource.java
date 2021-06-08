@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.pricing.resource.v2_0;
 
-import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Product;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Sku;
 import com.liferay.portal.kernel.service.GroupLocalService;
 import com.liferay.portal.kernel.service.RoleLocalService;
@@ -47,7 +46,7 @@ public interface SkuResource {
 		return FactoryHolder.factory.create();
 	}
 
-	public Product getDiscountSkuSku(Long discountSkuId) throws Exception;
+	public Sku getDiscountSkuSku(Long discountSkuId) throws Exception;
 
 	public Sku getPriceEntryIdSku(Long priceEntryId) throws Exception;
 

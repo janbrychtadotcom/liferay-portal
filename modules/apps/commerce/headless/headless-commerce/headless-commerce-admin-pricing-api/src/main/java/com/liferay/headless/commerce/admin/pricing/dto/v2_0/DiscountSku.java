@@ -177,6 +177,65 @@ public class DiscountSku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Long discountSkuId;
 
+	@DecimalMin("0")
+	@Schema
+	public Long getProductId() {
+		return productId;
+	}
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+
+	@JsonIgnore
+	public void setProductId(
+		UnsafeSupplier<Long, Exception> productIdUnsafeSupplier) {
+
+		try {
+			productId = productIdUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Long productId;
+
+	@Schema
+	@Valid
+	public Map<String, String> getProductName() {
+		return productName;
+	}
+
+	public void setProductName(Map<String, String> productName) {
+		this.productName = productName;
+	}
+
+	@JsonIgnore
+	public void setProductName(
+		UnsafeSupplier<Map<String, String>, Exception>
+			productNameUnsafeSupplier) {
+
+		try {
+			productName = productNameUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected Map<String, String> productName;
+
 	@Schema
 	@Valid
 	public Sku getSku() {
@@ -331,6 +390,26 @@ public class DiscountSku implements Serializable {
 			sb.append("\"discountSkuId\": ");
 
 			sb.append(discountSkuId);
+		}
+
+		if (productId != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"productId\": ");
+
+			sb.append(productId);
+		}
+
+		if (productName != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"productName\": ");
+
+			sb.append(_toJSON(productName));
 		}
 
 		if (sku != null) {

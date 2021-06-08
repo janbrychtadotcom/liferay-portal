@@ -1580,11 +1580,10 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
-	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {discountSkuSku(discountSkuId: ___){id, name, sku, thumbnail}}"}' -u 'test@liferay.com:test'
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {discountSkuSku(discountSkuId: ___){basePrice, basePriceFormatted, basePromoPrice, basePromoPriceFormatted, id, name}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
-	public Product discountSkuSku(
-			@GraphQLName("discountSkuId") Long discountSkuId)
+	public Sku discountSkuSku(@GraphQLName("discountSkuId") Long discountSkuId)
 		throws Exception {
 
 		return _applyComponentServiceObjects(

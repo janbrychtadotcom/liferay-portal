@@ -17,9 +17,11 @@ package com.liferay.headless.commerce.admin.pricing.internal.dto.v2_0.converter;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.model.CommerceDiscountRel;
 import com.liferay.commerce.discount.service.CommerceDiscountRelService;
+import com.liferay.commerce.product.model.CPDefinition;
 import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.commerce.product.service.CPInstanceService;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.DiscountSku;
+import com.liferay.headless.commerce.core.util.LanguageUtils;
 import com.liferay.portal.vulcan.dto.converter.DTOConverter;
 import com.liferay.portal.vulcan.dto.converter.DTOConverterContext;
 
@@ -56,6 +58,8 @@ public class DiscountSkuDTOConverter
 		CommerceDiscount commerceDiscount =
 			commerceDiscountRel.getCommerceDiscount();
 
+		CPDefinition cpDefinition = cpInstance.getCPDefinition();
+
 		return new DiscountSku() {
 			{
 				actions = dtoConverterContext.getActions();
@@ -65,7 +69,9 @@ public class DiscountSkuDTOConverter
 				discountSkuId = commerceDiscountRel.getCommerceDiscountRelId();
 				skuExternalReferenceCode = cpInstance.getExternalReferenceCode();
 				skuId = cpInstance.getCPInstanceId();
-
+				productName= LanguageUtils.getLanguageIdMap(
+					cpDefinition.getNameMap());
+				productId = cpDefinition.getCPDefinitionId();
 			}
 		};
 	}

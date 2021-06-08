@@ -32,6 +32,7 @@ import com.liferay.commerce.pricing.constants.CommercePricingPortletKeys;
 import com.liferay.commerce.pricing.model.CommercePricingClass;
 import com.liferay.commerce.pricing.web.internal.constants.CommerceDiscountScreenNavigationConstants;
 import com.liferay.commerce.product.model.CPDefinition;
+import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -325,24 +326,24 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 	public List<ClayDataSetActionDropdownItem>
 		getDiscountCPInstanceClayDataSetActionDropdownItems()
 		throws PortalException {
-//TODO: JB
 
-//		String t = PortletURLBuilder.create(
-//			PortletProviderUtil.getPortletURL(
-//				httpServletRequest, CPDefinition.class.getName(),
-//				PortletProvider.Action.MANAGE)
-//		).setMVCRenderCommandName(
-//			"/cp_definitions/edit_cp_definition"
-//		).setRedirect(
-//			commercePricingRequestHelper.getCurrentURL()
-//		).setParameter(
-//			"cpDefinitionId", "{sku.id}"
-//		).setParameter(
-//			"screenNavigationCategoryKey", "details"
-//		).buildString();
-//
-//		return getClayHeadlessDataSetActionTemplates(t, false);
-		return new ArrayList<>();
+		return getClayHeadlessDataSetActionTemplates(
+			PortletURLBuilder.create(
+				PortletProviderUtil.getPortletURL(
+					httpServletRequest, CPDefinition.class.getName(),
+					PortletProvider.Action.MANAGE)
+			).setMVCRenderCommandName(
+				"/cp_definitions/edit_cp_instance"
+			).setRedirect(
+				commercePricingRequestHelper.getCurrentURL()
+			).setParameter(
+				"cpDefinitionId", "{productId}"
+			).setParameter(
+				"cpInstanceId", "{sku.id}"
+			).setParameter(
+				"screenNavigationCategoryKey", "details"
+			).buildString(),
+			false);
 
 	}
 

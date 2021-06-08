@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.resource.v2_0;
 
-import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Product;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Sku;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.SkuResource;
 import com.liferay.petra.function.UnsafeFunction;
@@ -87,12 +86,12 @@ public abstract class BaseSkuResourceImpl
 	@Path("/discount-skus/{discountSkuId}/sku")
 	@Produces({"application/json", "application/xml"})
 	@Tags(value = {@Tag(name = "Sku")})
-	public Product getDiscountSkuSku(
+	public Sku getDiscountSkuSku(
 			@NotNull @Parameter(hidden = true) @PathParam("discountSkuId") Long
 				discountSkuId)
 		throws Exception {
 
-		return new Product();
+		return new Sku();
 	}
 
 	/**

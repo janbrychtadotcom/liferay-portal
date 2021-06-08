@@ -14,7 +14,6 @@
 
 package com.liferay.headless.commerce.admin.pricing.client.resource.v2_0;
 
-import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.Product;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.Sku;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.problem.Problem;
@@ -38,7 +37,7 @@ public interface SkuResource {
 		return new Builder();
 	}
 
-	public Product getDiscountSkuSku(Long discountSkuId) throws Exception;
+	public Sku getDiscountSkuSku(Long discountSkuId) throws Exception;
 
 	public HttpInvoker.HttpResponse getDiscountSkuSkuHttpResponse(
 			Long discountSkuId)
@@ -121,7 +120,7 @@ public interface SkuResource {
 
 	public static class SkuResourceImpl implements SkuResource {
 
-		public Product getDiscountSkuSku(Long discountSkuId) throws Exception {
+		public Sku getDiscountSkuSku(Long discountSkuId) throws Exception {
 			HttpInvoker.HttpResponse httpResponse =
 				getDiscountSkuSkuHttpResponse(discountSkuId);
 
@@ -152,7 +151,7 @@ public interface SkuResource {
 
 			try {
 				return com.liferay.headless.commerce.admin.pricing.client.
-					serdes.v2_0.ProductSerDes.toDTO(content);
+					serdes.v2_0.SkuSerDes.toDTO(content);
 			}
 			catch (Exception e) {
 				_logger.log(

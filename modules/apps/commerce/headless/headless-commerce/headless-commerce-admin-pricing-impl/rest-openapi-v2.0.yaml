@@ -547,6 +547,19 @@ components:
                     minimum: 0
                     readOnly: true
                     type: integer
+                productName:
+                    additionalProperties:
+                        type: string
+                    example:
+                        en_US: Hand Saw
+                        hr_HR: Product Name HR
+                        hu_HU: Product Name HU
+                    type: object
+                productId:
+                    example: 30324
+                    format: int64
+                    minimum: 0
+                    type: integer
                 sku:
                     $ref: "#/components/schemas/Sku"
                     readOnly: true
@@ -2182,10 +2195,10 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: "#/components/schemas/Product"
+                                $ref: "#/components/schemas/Sku"
                         application/xml:
                             schema:
-                                $ref: "#/components/schemas/Product"
+                                $ref: "#/components/schemas/Sku"
                     description:
                         Successful operation
                 400:

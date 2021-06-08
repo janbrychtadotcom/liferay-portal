@@ -779,6 +779,22 @@ public abstract class BaseDiscountSkuResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("productId", additionalAssertFieldName)) {
+				if (discountSku.getProductId() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("productName", additionalAssertFieldName)) {
+				if (discountSku.getProductName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("sku", additionalAssertFieldName)) {
 				if (discountSku.getSku() == null) {
 					valid = false;
@@ -944,6 +960,28 @@ public abstract class BaseDiscountSkuResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals("productId", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						discountSku1.getProductId(),
+						discountSku2.getProductId())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("productName", additionalAssertFieldName)) {
+				if (!equals(
+						(Map)discountSku1.getProductName(),
+						(Map)discountSku2.getProductName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("sku", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						discountSku1.getSku(), discountSku2.getSku())) {
@@ -1096,6 +1134,16 @@ public abstract class BaseDiscountSkuResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("productId")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
+		if (entityFieldName.equals("productName")) {
+			throw new IllegalArgumentException(
+				"Invalid entity field " + entityFieldName);
+		}
+
 		if (entityFieldName.equals("sku")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -1163,6 +1211,7 @@ public abstract class BaseDiscountSkuResourceTestCase {
 					RandomTestUtil.randomString());
 				discountId = RandomTestUtil.randomLong();
 				discountSkuId = RandomTestUtil.randomLong();
+				productId = RandomTestUtil.randomLong();
 				skuExternalReferenceCode = StringUtil.toLowerCase(
 					RandomTestUtil.randomString());
 				skuId = RandomTestUtil.randomLong();
