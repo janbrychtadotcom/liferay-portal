@@ -46,7 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 @Component(
 	enabled = false, immediate = true,
 	property = {
-		"commerce.discount.target.key=" + CommerceDiscountConstants.TARGET_SKU,
+		"commerce.discount.target.key=" + CommerceDiscountConstants.TARGET_SKUS,
 		"commerce.discount.target.order:Integer=20"
 	},
 	service = {CommerceDiscountSKUTarget.class, CommerceDiscountTarget.class}
@@ -73,7 +73,7 @@ public class ApplyToSKUCommerceDiscountTargetImpl
 
 	@Override
 	public String getKey() {
-		return CommerceDiscountConstants.TARGET_SKU;
+		return CommerceDiscountConstants.TARGET_SKUS;
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class ApplyToSKUCommerceDiscountTargetImpl
 		ResourceBundle resourceBundle = ResourceBundleUtil.getBundle(
 			"content.Language", locale, getClass());
 
-		return LanguageUtil.get(resourceBundle, "products-skus");
+		return LanguageUtil.get(resourceBundle, CommerceDiscountConstants.TARGET_SKUS);
 	}
 
 	@Override
