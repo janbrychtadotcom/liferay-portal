@@ -14,6 +14,7 @@
 
 package com.liferay.headless.commerce.admin.pricing.internal.resource.v2_0;
 
+import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Product;
 import com.liferay.headless.commerce.admin.pricing.dto.v2_0.Sku;
 import com.liferay.headless.commerce.admin.pricing.resource.v2_0.SkuResource;
 import com.liferay.petra.function.UnsafeFunction;
@@ -72,6 +73,27 @@ import javax.ws.rs.core.UriInfo;
 public abstract class BaseSkuResourceImpl
 	implements EntityModelResource, SkuResource,
 			   VulcanBatchEngineTaskItemDelegate<Sku> {
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -X 'GET' 'http://localhost:8080/o/headless-commerce-admin-pricing/v2.0/discount-skus/{discountSkuId}/sku'  -u 'test@liferay.com:test'
+	 */
+	@GET
+	@Override
+	@Parameters(
+		value = {@Parameter(in = ParameterIn.PATH, name = "discountSkuId")}
+	)
+	@Path("/discount-skus/{discountSkuId}/sku")
+	@Produces({"application/json", "application/xml"})
+	@Tags(value = {@Tag(name = "Sku")})
+	public Product getDiscountSkuSku(
+			@NotNull @Parameter(hidden = true) @PathParam("discountSkuId") Long
+				discountSkuId)
+		throws Exception {
+
+		return new Product();
+	}
 
 	/**
 	 * Invoke this method with the command line:

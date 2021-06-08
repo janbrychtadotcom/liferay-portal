@@ -109,6 +109,20 @@ public class DiscountSkuSerDes {
 			sb.append(String.valueOf(discountSku.getSku()));
 		}
 
+		if (discountSku.getSkuExternalReferenceCode() != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"skuExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(discountSku.getSkuExternalReferenceCode()));
+
+			sb.append("\"");
+		}
+
 		if (discountSku.getSkuId() != null) {
 			if (sb.length() > 1) {
 				sb.append(", ");
@@ -177,6 +191,15 @@ public class DiscountSkuSerDes {
 			map.put("sku", String.valueOf(discountSku.getSku()));
 		}
 
+		if (discountSku.getSkuExternalReferenceCode() == null) {
+			map.put("skuExternalReferenceCode", null);
+		}
+		else {
+			map.put(
+				"skuExternalReferenceCode",
+				String.valueOf(discountSku.getSkuExternalReferenceCode()));
+		}
+
 		if (discountSku.getSkuId() == null) {
 			map.put("skuId", null);
 		}
@@ -236,6 +259,14 @@ public class DiscountSkuSerDes {
 				if (jsonParserFieldValue != null) {
 					discountSku.setSku(
 						SkuSerDes.toDTO((String)jsonParserFieldValue));
+				}
+			}
+			else if (Objects.equals(
+						jsonParserFieldName, "skuExternalReferenceCode")) {
+
+				if (jsonParserFieldValue != null) {
+					discountSku.setSkuExternalReferenceCode(
+						(String)jsonParserFieldValue);
 				}
 			}
 			else if (Objects.equals(jsonParserFieldName, "skuId")) {

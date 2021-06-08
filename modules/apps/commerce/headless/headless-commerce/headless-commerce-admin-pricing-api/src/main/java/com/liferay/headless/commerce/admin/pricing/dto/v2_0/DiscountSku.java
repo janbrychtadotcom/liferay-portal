@@ -204,6 +204,36 @@ public class DiscountSku implements Serializable {
 	@JsonProperty(access = JsonProperty.Access.READ_ONLY)
 	protected Sku sku;
 
+	@Schema
+	public String getSkuExternalReferenceCode() {
+		return skuExternalReferenceCode;
+	}
+
+	public void setSkuExternalReferenceCode(String skuExternalReferenceCode) {
+		this.skuExternalReferenceCode = skuExternalReferenceCode;
+	}
+
+	@JsonIgnore
+	public void setSkuExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			skuExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			skuExternalReferenceCode =
+				skuExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (RuntimeException re) {
+			throw re;
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@GraphQLField
+	@JsonProperty(access = JsonProperty.Access.READ_WRITE)
+	protected String skuExternalReferenceCode;
+
 	@DecimalMin("0")
 	@Schema
 	public Long getSkuId() {
@@ -311,6 +341,20 @@ public class DiscountSku implements Serializable {
 			sb.append("\"sku\": ");
 
 			sb.append(String.valueOf(sku));
+		}
+
+		if (skuExternalReferenceCode != null) {
+			if (sb.length() > 1) {
+				sb.append(", ");
+			}
+
+			sb.append("\"skuExternalReferenceCode\": ");
+
+			sb.append("\"");
+
+			sb.append(_escape(skuExternalReferenceCode));
+
+			sb.append("\"");
 		}
 
 		if (skuId != null) {

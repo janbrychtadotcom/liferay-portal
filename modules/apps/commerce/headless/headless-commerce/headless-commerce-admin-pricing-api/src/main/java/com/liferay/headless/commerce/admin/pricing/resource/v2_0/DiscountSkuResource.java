@@ -56,6 +56,14 @@ public interface DiscountSkuResource {
 	public Response deleteDiscountSkuBatch(String callbackURL, Object object)
 		throws Exception;
 
+	public Page<DiscountSku> getDiscountByExternalReferenceCodeDiscountSkusPage(
+			String externalReferenceCode, Pagination pagination)
+		throws Exception;
+
+	public DiscountSku postDiscountByExternalReferenceCodeDiscountSku(
+			String externalReferenceCode, DiscountSku discountSku)
+		throws Exception;
+
 	public Page<DiscountSku> getDiscountIdDiscountSkusPage(
 			Long id, String search, Filter filter, Pagination pagination,
 			Sort[] sorts)

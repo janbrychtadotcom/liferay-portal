@@ -143,6 +143,29 @@ public class DiscountSku implements Cloneable, Serializable {
 
 	protected Sku sku;
 
+	public String getSkuExternalReferenceCode() {
+		return skuExternalReferenceCode;
+	}
+
+	public void setSkuExternalReferenceCode(String skuExternalReferenceCode) {
+		this.skuExternalReferenceCode = skuExternalReferenceCode;
+	}
+
+	public void setSkuExternalReferenceCode(
+		UnsafeSupplier<String, Exception>
+			skuExternalReferenceCodeUnsafeSupplier) {
+
+		try {
+			skuExternalReferenceCode =
+				skuExternalReferenceCodeUnsafeSupplier.get();
+		}
+		catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	protected String skuExternalReferenceCode;
+
 	public Long getSkuId() {
 		return skuId;
 	}

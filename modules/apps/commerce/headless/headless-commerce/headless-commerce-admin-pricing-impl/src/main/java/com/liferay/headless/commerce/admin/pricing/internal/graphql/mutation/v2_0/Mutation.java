@@ -895,6 +895,21 @@ public class Mutation {
 	}
 
 	@GraphQLField
+	public DiscountSku createDiscountByExternalReferenceCodeDiscountSku(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("discountSku") DiscountSku discountSku)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource ->
+				discountSkuResource.
+					postDiscountByExternalReferenceCodeDiscountSku(
+						externalReferenceCode, discountSku));
+	}
+
+	@GraphQLField
 	public DiscountSku createDiscountIdDiscountSku(
 			@GraphQLName("id") Long id,
 			@GraphQLName("discountSku") DiscountSku discountSku)

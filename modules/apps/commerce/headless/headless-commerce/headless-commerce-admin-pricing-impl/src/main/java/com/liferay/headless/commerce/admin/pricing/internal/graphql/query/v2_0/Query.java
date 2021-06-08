@@ -875,6 +875,27 @@ public class Query {
 	/**
 	 * Invoke this method with the command line:
 	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {discountByExternalReferenceCodeDiscountSkus(externalReferenceCode: ___, page: ___, pageSize: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public DiscountSkuPage discountByExternalReferenceCodeDiscountSkus(
+			@GraphQLName("externalReferenceCode") String externalReferenceCode,
+			@GraphQLName("pageSize") int pageSize,
+			@GraphQLName("page") int page)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_discountSkuResourceComponentServiceObjects,
+			this::_populateResourceContext,
+			discountSkuResource -> new DiscountSkuPage(
+				discountSkuResource.
+					getDiscountByExternalReferenceCodeDiscountSkusPage(
+						externalReferenceCode, Pagination.of(page, pageSize))));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
 	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {discountIdDiscountSkus(filter: ___, id: ___, page: ___, pageSize: ___, search: ___, sorts: ___){items {__}, page, pageSize, totalCount}}"}' -u 'test@liferay.com:test'
 	 */
 	@GraphQLField
@@ -1554,6 +1575,21 @@ public class Query {
 			productGroupResource ->
 				productGroupResource.getPriceModifierProductGroupProductGroup(
 					priceModifierProductGroupId));
+	}
+
+	/**
+	 * Invoke this method with the command line:
+	 *
+	 * curl -H 'Content-Type: text/plain; charset=utf-8' -X 'POST' 'http://localhost:8080/o/graphql' -d $'{"query": "query {discountSkuSku(discountSkuId: ___){id, name, sku, thumbnail}}"}' -u 'test@liferay.com:test'
+	 */
+	@GraphQLField
+	public Product discountSkuSku(
+			@GraphQLName("discountSkuId") Long discountSkuId)
+		throws Exception {
+
+		return _applyComponentServiceObjects(
+			_skuResourceComponentServiceObjects, this::_populateResourceContext,
+			skuResource -> skuResource.getDiscountSkuSku(discountSkuId));
 	}
 
 	/**
@@ -2244,6 +2280,36 @@ public class Query {
 				priceListChannelResource -> new PriceListChannelPage(
 					priceListChannelResource.
 						getPriceListByExternalReferenceCodePriceListChannelsPage(
+							_discount.getExternalReferenceCode(),
+							Pagination.of(page, pageSize))));
+		}
+
+		private Discount _discount;
+
+	}
+
+	@GraphQLTypeExtension(Discount.class)
+	public class
+		GetDiscountByExternalReferenceCodeDiscountSkusPageTypeExtension {
+
+		public GetDiscountByExternalReferenceCodeDiscountSkusPageTypeExtension(
+			Discount discount) {
+
+			_discount = discount;
+		}
+
+		@GraphQLField
+		public DiscountSkuPage byExternalReferenceCodeDiscountSkus(
+				@GraphQLName("pageSize") int pageSize,
+				@GraphQLName("page") int page)
+			throws Exception {
+
+			return _applyComponentServiceObjects(
+				_discountSkuResourceComponentServiceObjects,
+				Query.this::_populateResourceContext,
+				discountSkuResource -> new DiscountSkuPage(
+					discountSkuResource.
+						getDiscountByExternalReferenceCodeDiscountSkusPage(
 							_discount.getExternalReferenceCode(),
 							Pagination.of(page, pageSize))));
 		}

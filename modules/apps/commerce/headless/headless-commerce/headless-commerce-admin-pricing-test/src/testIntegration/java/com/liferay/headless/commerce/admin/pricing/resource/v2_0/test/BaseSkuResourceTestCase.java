@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
+import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.Product;
 import com.liferay.headless.commerce.admin.pricing.client.dto.v2_0.Sku;
 import com.liferay.headless.commerce.admin.pricing.client.http.HttpInvoker;
 import com.liferay.headless.commerce.admin.pricing.client.pagination.Page;
@@ -250,6 +251,27 @@ public abstract class BaseSkuResourceTestCase {
 				"Object/code"));
 	}
 
+	@Test
+	public void testGetDiscountSkuSku() throws Exception {
+		Sku postSku = testGetSku_addSku();
+
+		Product postProduct = testGetDiscountSkuSku_addProduct(
+			postSku.getId(), randomProduct());
+
+		Product getProduct = skuResource.getDiscountSkuSku(postSku.getId());
+
+		assertEquals(postProduct, getProduct);
+		assertValid(getProduct);
+	}
+
+	protected Product testGetDiscountSkuSku_addProduct(
+			long skuId, Product product)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
 	protected Sku testGraphQLSku_addSku() throws Exception {
 		throw new UnsupportedOperationException(
 			"This method needs to be implemented");
@@ -276,6 +298,12 @@ public abstract class BaseSkuResourceTestCase {
 
 			assertEquals(sku1, sku2);
 		}
+	}
+
+	protected void assertEquals(Product product1, Product product2) {
+		Assert.assertTrue(
+			product1 + " does not equal " + product2,
+			equals(product1, product2));
 	}
 
 	protected void assertEqualsIgnoringOrder(List<Sku> skus1, List<Sku> skus2) {
@@ -375,7 +403,53 @@ public abstract class BaseSkuResourceTestCase {
 		Assert.assertTrue(valid);
 	}
 
+	protected void assertValid(Product product) {
+		boolean valid = true;
+
+		if (product.getId() == null) {
+			valid = false;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalProductAssertFieldNames()) {
+
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (product.getName() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("sku", additionalAssertFieldName)) {
+				if (product.getSku() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("thumbnail", additionalAssertFieldName)) {
+				if (product.getThumbnail() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		Assert.assertTrue(valid);
+	}
+
 	protected String[] getAdditionalAssertFieldNames() {
+		return new String[0];
+	}
+
+	protected String[] getAdditionalProductAssertFieldNames() {
 		return new String[0];
 	}
 
@@ -534,6 +608,58 @@ public abstract class BaseSkuResourceTestCase {
 		}
 
 		return false;
+	}
+
+	protected boolean equals(Product product1, Product product2) {
+		if (product1 == product2) {
+			return true;
+		}
+
+		for (String additionalAssertFieldName :
+				getAdditionalProductAssertFieldNames()) {
+
+			if (Objects.equals("id", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(product1.getId(), product2.getId())) {
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("name", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						product1.getName(), product2.getName())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("sku", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(product1.getSku(), product2.getSku())) {
+					return false;
+				}
+
+				continue;
+			}
+
+			if (Objects.equals("thumbnail", additionalAssertFieldName)) {
+				if (!Objects.deepEquals(
+						product1.getThumbnail(), product2.getThumbnail())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
+			throw new IllegalArgumentException(
+				"Invalid additional assert field name " +
+					additionalAssertFieldName);
+		}
+
+		return true;
 	}
 
 	protected Field[] getDeclaredFields(Class clazz) throws Exception {
@@ -700,6 +826,16 @@ public abstract class BaseSkuResourceTestCase {
 
 	protected Sku randomPatchSku() throws Exception {
 		return randomSku();
+	}
+
+	protected Product randomProduct() throws Exception {
+		return new Product() {
+			{
+				id = RandomTestUtil.randomLong();
+				sku = RandomTestUtil.randomString();
+				thumbnail = RandomTestUtil.randomString();
+			}
+		};
 	}
 
 	protected SkuResource skuResource;

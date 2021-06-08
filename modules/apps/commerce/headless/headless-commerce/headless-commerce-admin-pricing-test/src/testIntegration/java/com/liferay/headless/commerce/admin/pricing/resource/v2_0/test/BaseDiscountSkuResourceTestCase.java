@@ -188,6 +188,7 @@ public abstract class BaseDiscountSkuResourceTestCase {
 		DiscountSku discountSku = randomDiscountSku();
 
 		discountSku.setDiscountExternalReferenceCode(regex);
+		discountSku.setSkuExternalReferenceCode(regex);
 
 		String json = DiscountSkuSerDes.toJSON(discountSku);
 
@@ -197,6 +198,7 @@ public abstract class BaseDiscountSkuResourceTestCase {
 
 		Assert.assertEquals(
 			regex, discountSku.getDiscountExternalReferenceCode());
+		Assert.assertEquals(regex, discountSku.getSkuExternalReferenceCode());
 	}
 
 	@Test
@@ -207,6 +209,159 @@ public abstract class BaseDiscountSkuResourceTestCase {
 	@Test
 	public void testGraphQLDeleteDiscountSku() throws Exception {
 		Assert.assertTrue(false);
+	}
+
+	@Test
+	public void testGetDiscountByExternalReferenceCodeDiscountSkusPage()
+		throws Exception {
+
+		Page<DiscountSku> page =
+			discountSkuResource.
+				getDiscountByExternalReferenceCodeDiscountSkusPage(
+					testGetDiscountByExternalReferenceCodeDiscountSkusPage_getExternalReferenceCode(),
+					Pagination.of(1, 2));
+
+		Assert.assertEquals(0, page.getTotalCount());
+
+		String externalReferenceCode =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_getExternalReferenceCode();
+		String irrelevantExternalReferenceCode =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_getIrrelevantExternalReferenceCode();
+
+		if (irrelevantExternalReferenceCode != null) {
+			DiscountSku irrelevantDiscountSku =
+				testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+					irrelevantExternalReferenceCode,
+					randomIrrelevantDiscountSku());
+
+			page =
+				discountSkuResource.
+					getDiscountByExternalReferenceCodeDiscountSkusPage(
+						irrelevantExternalReferenceCode, Pagination.of(1, 2));
+
+			Assert.assertEquals(1, page.getTotalCount());
+
+			assertEquals(
+				Arrays.asList(irrelevantDiscountSku),
+				(List<DiscountSku>)page.getItems());
+			assertValid(page);
+		}
+
+		DiscountSku discountSku1 =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+				externalReferenceCode, randomDiscountSku());
+
+		DiscountSku discountSku2 =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+				externalReferenceCode, randomDiscountSku());
+
+		page =
+			discountSkuResource.
+				getDiscountByExternalReferenceCodeDiscountSkusPage(
+					externalReferenceCode, Pagination.of(1, 2));
+
+		Assert.assertEquals(2, page.getTotalCount());
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(discountSku1, discountSku2),
+			(List<DiscountSku>)page.getItems());
+		assertValid(page);
+	}
+
+	@Test
+	public void testGetDiscountByExternalReferenceCodeDiscountSkusPageWithPagination()
+		throws Exception {
+
+		String externalReferenceCode =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_getExternalReferenceCode();
+
+		DiscountSku discountSku1 =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+				externalReferenceCode, randomDiscountSku());
+
+		DiscountSku discountSku2 =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+				externalReferenceCode, randomDiscountSku());
+
+		DiscountSku discountSku3 =
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+				externalReferenceCode, randomDiscountSku());
+
+		Page<DiscountSku> page1 =
+			discountSkuResource.
+				getDiscountByExternalReferenceCodeDiscountSkusPage(
+					externalReferenceCode, Pagination.of(1, 2));
+
+		List<DiscountSku> discountSkus1 = (List<DiscountSku>)page1.getItems();
+
+		Assert.assertEquals(discountSkus1.toString(), 2, discountSkus1.size());
+
+		Page<DiscountSku> page2 =
+			discountSkuResource.
+				getDiscountByExternalReferenceCodeDiscountSkusPage(
+					externalReferenceCode, Pagination.of(2, 2));
+
+		Assert.assertEquals(3, page2.getTotalCount());
+
+		List<DiscountSku> discountSkus2 = (List<DiscountSku>)page2.getItems();
+
+		Assert.assertEquals(discountSkus2.toString(), 1, discountSkus2.size());
+
+		Page<DiscountSku> page3 =
+			discountSkuResource.
+				getDiscountByExternalReferenceCodeDiscountSkusPage(
+					externalReferenceCode, Pagination.of(1, 3));
+
+		assertEqualsIgnoringOrder(
+			Arrays.asList(discountSku1, discountSku2, discountSku3),
+			(List<DiscountSku>)page3.getItems());
+	}
+
+	protected DiscountSku
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_addDiscountSku(
+				String externalReferenceCode, DiscountSku discountSku)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_getExternalReferenceCode()
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
+	}
+
+	protected String
+			testGetDiscountByExternalReferenceCodeDiscountSkusPage_getIrrelevantExternalReferenceCode()
+		throws Exception {
+
+		return null;
+	}
+
+	@Test
+	public void testPostDiscountByExternalReferenceCodeDiscountSku()
+		throws Exception {
+
+		DiscountSku randomDiscountSku = randomDiscountSku();
+
+		DiscountSku postDiscountSku =
+			testPostDiscountByExternalReferenceCodeDiscountSku_addDiscountSku(
+				randomDiscountSku);
+
+		assertEquals(randomDiscountSku, postDiscountSku);
+		assertValid(postDiscountSku);
+	}
+
+	protected DiscountSku
+			testPostDiscountByExternalReferenceCodeDiscountSku_addDiscountSku(
+				DiscountSku discountSku)
+		throws Exception {
+
+		throw new UnsupportedOperationException(
+			"This method needs to be implemented");
 	}
 
 	@Test
@@ -632,6 +787,16 @@ public abstract class BaseDiscountSkuResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"skuExternalReferenceCode", additionalAssertFieldName)) {
+
+				if (discountSku.getSkuExternalReferenceCode() == null) {
+					valid = false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("skuId", additionalAssertFieldName)) {
 				if (discountSku.getSkuId() == null) {
 					valid = false;
@@ -789,6 +954,19 @@ public abstract class BaseDiscountSkuResourceTestCase {
 				continue;
 			}
 
+			if (Objects.equals(
+					"skuExternalReferenceCode", additionalAssertFieldName)) {
+
+				if (!Objects.deepEquals(
+						discountSku1.getSkuExternalReferenceCode(),
+						discountSku2.getSkuExternalReferenceCode())) {
+
+					return false;
+				}
+
+				continue;
+			}
+
 			if (Objects.equals("skuId", additionalAssertFieldName)) {
 				if (!Objects.deepEquals(
 						discountSku1.getSkuId(), discountSku2.getSkuId())) {
@@ -923,6 +1101,15 @@ public abstract class BaseDiscountSkuResourceTestCase {
 				"Invalid entity field " + entityFieldName);
 		}
 
+		if (entityFieldName.equals("skuExternalReferenceCode")) {
+			sb.append("'");
+			sb.append(
+				String.valueOf(discountSku.getSkuExternalReferenceCode()));
+			sb.append("'");
+
+			return sb.toString();
+		}
+
 		if (entityFieldName.equals("skuId")) {
 			throw new IllegalArgumentException(
 				"Invalid entity field " + entityFieldName);
@@ -976,6 +1163,8 @@ public abstract class BaseDiscountSkuResourceTestCase {
 					RandomTestUtil.randomString());
 				discountId = RandomTestUtil.randomLong();
 				discountSkuId = RandomTestUtil.randomLong();
+				skuExternalReferenceCode = StringUtil.toLowerCase(
+					RandomTestUtil.randomString());
 				skuId = RandomTestUtil.randomLong();
 			}
 		};
