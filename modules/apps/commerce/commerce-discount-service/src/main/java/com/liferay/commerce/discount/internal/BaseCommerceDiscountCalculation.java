@@ -19,6 +19,7 @@ import com.liferay.commerce.account.util.CommerceAccountHelper;
 import com.liferay.commerce.discount.CommerceDiscountCalculation;
 import com.liferay.commerce.discount.model.CommerceDiscount;
 import com.liferay.commerce.discount.service.CommerceDiscountLocalService;
+import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.portal.kernel.exception.PortalException;
 
 import java.util.List;
@@ -60,6 +61,21 @@ public abstract class BaseCommerceDiscountCalculation
 
 		return _getProductCommerceDiscountByHierarchy(
 			companyId, commerceAccountId, commerceChannelId, cpDefinitionId);
+	}
+
+	protected List<CommerceDiscount> getSkuCommerceDiscountByHierarchy(
+		long companyId, CommerceAccount commerceAccount,
+		long commerceChannelId, CPInstance cpInstance)
+		throws PortalException {
+
+		long commerceAccountId = 0;
+
+		if (commerceAccount != null) {
+			commerceAccountId = commerceAccount.getCommerceAccountId();
+		}
+
+		return _getSkuCommerceDiscountByHierarchy(
+			companyId, commerceAccountId, commerceChannelId, cpInstance);
 	}
 
 	@Reference
@@ -174,6 +190,59 @@ public abstract class BaseCommerceDiscountCalculation
 
 		return commerceDiscountLocalService.getUnqualifiedCommerceDiscounts(
 			companyId, cpDefinitionId);
+	}
+
+	private List<CommerceDiscount> _getSkuCommerceDiscountByHierarchy(
+		long companyId, long commerceAccountId, long commerceChannelId,
+		CPInstance cpInstance)
+		throws PortalException {
+
+		List<CommerceDiscount> commerceDiscounts =
+			commerceDiscountLocalService.getAccountAndChannelCommerceDiscountsBySku(
+				commerceAccountId, commerceChannelId, cpInstance.getCPInstanceId(), cpInstance.getCPDefinitionId());
+
+		if ((commerceDiscounts != null) && !commerceDiscounts.isEmpty()) {
+			return commerceDiscounts;
+		}
+
+		commerceDiscounts =
+			commerceDiscountLocalService.getAccountCommerceDiscountsBySku(
+				commerceAccountId, cpInstance.getCPInstanceId(), cpInstance.getCPDefinitionId());
+
+		if ((commerceDiscounts != null) && !commerceDiscounts.isEmpty()) {
+			return commerceDiscounts;
+		}
+
+		long[] commerceAccountGroupIds =
+			commerceAccountHelper.getCommerceAccountGroupIds(commerceAccountId);
+
+		commerceDiscounts =
+			commerceDiscountLocalService.
+				getAccountGroupAndChannelCommerceDiscountBySku(
+					commerceAccountGroupIds, commerceChannelId, cpInstance.getCPInstanceId(), cpInstance.getCPDefinitionId());
+
+		if ((commerceDiscounts != null) && !commerceDiscounts.isEmpty()) {
+			return commerceDiscounts;
+		}
+
+		commerceDiscounts =
+			commerceDiscountLocalService.getAccountGroupCommerceDiscountBySku(
+				commerceAccountGroupIds, cpInstance.getCPInstanceId(), cpInstance.getCPDefinitionId());
+
+		if ((commerceDiscounts != null) && !commerceDiscounts.isEmpty()) {
+			return commerceDiscounts;
+		}
+
+		commerceDiscounts =
+			commerceDiscountLocalService.getChannelCommerceDiscountsBySku(
+				commerceChannelId, cpInstance.getCPInstanceId(), cpInstance.getCPDefinitionId());
+
+		if ((commerceDiscounts != null) && !commerceDiscounts.isEmpty()) {
+			return commerceDiscounts;
+		}
+
+		return commerceDiscountLocalService.getUnqualifiedCommerceDiscountsBySku(
+			companyId, cpInstance.getCPInstanceId(), cpInstance.getCPDefinitionId());
 	}
 
 }

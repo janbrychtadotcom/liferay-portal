@@ -159,13 +159,22 @@ public class CommerceDiscountCalculationV2Impl
 		}
 
 		List<CommerceDiscount> commerceDiscounts =
-			getProductCommerceDiscountByHierarchy(
+			getSkuCommerceDiscountByHierarchy(
 				cpInstance.getCompanyId(), commerceContext.getCommerceAccount(),
 				commerceContext.getCommerceChannelId(),
-				cpInstance.getCPDefinitionId());
+				cpInstance);
 
-		if (commerceDiscounts.isEmpty()) {
-			return null;
+		if(commerceDiscounts == null || commerceDiscounts.isEmpty()){
+
+			commerceDiscounts =
+				getProductCommerceDiscountByHierarchy(
+					cpInstance.getCompanyId(), commerceContext.getCommerceAccount(),
+					commerceContext.getCommerceChannelId(),
+					cpInstance.getCPDefinitionId());
+
+			if (commerceDiscounts.isEmpty()) {
+				return null;
+			}
 		}
 
 		return _getCommerceDiscountValues(

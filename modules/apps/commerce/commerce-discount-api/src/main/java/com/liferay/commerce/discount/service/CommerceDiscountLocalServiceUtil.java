@@ -482,6 +482,15 @@ public class CommerceDiscountLocalServiceUtil {
 			commerceAccountId, commerceChannelId, commerceDiscountTargetType);
 	}
 
+	public static List<CommerceDiscount>
+		getAccountAndChannelCommerceDiscountsBySku(
+			long commerceAccountId, long commerceChannelId, long cpInstanceId,
+			long cpDefinitionId) {
+
+		return getService().getAccountAndChannelCommerceDiscountsBySku(
+			commerceAccountId, commerceChannelId, cpInstanceId, cpDefinitionId);
+	}
+
 	public static List<CommerceDiscount> getAccountCommerceDiscounts(
 		long commerceAccountId, long cpDefinitionId) {
 
@@ -494,6 +503,13 @@ public class CommerceDiscountLocalServiceUtil {
 
 		return getService().getAccountCommerceDiscounts(
 			commerceAccountId, commerceDiscountTargetType);
+	}
+
+	public static List<CommerceDiscount> getAccountCommerceDiscountsBySku(
+		long commerceAccountId, long cpInstanceId, long cpDefinitionId) {
+
+		return getService().getAccountCommerceDiscountsBySku(
+			commerceAccountId, cpInstanceId, cpDefinitionId);
 	}
 
 	public static List<CommerceDiscount>
@@ -515,6 +531,16 @@ public class CommerceDiscountLocalServiceUtil {
 			commerceDiscountTargetType);
 	}
 
+	public static List<CommerceDiscount>
+		getAccountGroupAndChannelCommerceDiscountBySku(
+			long[] commerceAccountGroupIds, long commerceChannelId,
+			long cpInstanceId, long cpDefinitionId) {
+
+		return getService().getAccountGroupAndChannelCommerceDiscountBySku(
+			commerceAccountGroupIds, commerceChannelId, cpInstanceId,
+			cpDefinitionId);
+	}
+
 	public static List<CommerceDiscount> getAccountGroupCommerceDiscount(
 		long[] commerceAccountGroupIds, long cpDefinitionId) {
 
@@ -527,6 +553,14 @@ public class CommerceDiscountLocalServiceUtil {
 
 		return getService().getAccountGroupCommerceDiscount(
 			commerceAccountGroupIds, commerceDiscountTargetType);
+	}
+
+	public static List<CommerceDiscount> getAccountGroupCommerceDiscountBySku(
+		long[] commerceAccountGroupIds, long cpInstanceId,
+		long cpDefinitionId) {
+
+		return getService().getAccountGroupCommerceDiscountBySku(
+			commerceAccountGroupIds, cpInstanceId, cpDefinitionId);
 	}
 
 	public static com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery
@@ -562,6 +596,13 @@ public class CommerceDiscountLocalServiceUtil {
 
 		return getService().getChannelCommerceDiscounts(
 			commerceChannelId, commerceDiscountTargetType);
+	}
+
+	public static List<CommerceDiscount> getChannelCommerceDiscountsBySku(
+		long commerceChannelId, long cpInstanceId, long cpDefinitionId) {
+
+		return getService().getChannelCommerceDiscountsBySku(
+			commerceChannelId, cpInstanceId, cpDefinitionId);
 	}
 
 	/**
@@ -714,6 +755,13 @@ public class CommerceDiscountLocalServiceUtil {
 
 		return getService().getUnqualifiedCommerceDiscounts(
 			companyId, commerceDiscountTargetType);
+	}
+
+	public static List<CommerceDiscount> getUnqualifiedCommerceDiscountsBySku(
+		long companyId, long cpInstanceId, long cpDefinitionId) {
+
+		return getService().getUnqualifiedCommerceDiscountsBySku(
+			companyId, cpInstanceId, cpDefinitionId);
 	}
 
 	public static int getValidCommerceDiscountsCount(

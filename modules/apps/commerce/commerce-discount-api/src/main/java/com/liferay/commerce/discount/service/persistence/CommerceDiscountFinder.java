@@ -48,22 +48,33 @@ public interface CommerceDiscountFinder {
 			long[] commercePricingClassIds);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
-		findByUnqualifiedOrder(
-			long companyId, String commerceDiscountTargetType);
-
-	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		findByA_C_C_Product(
 			long commerceAccountId, long cpDefinitionId,
 			long[] assetCategoryIds, long[] commercePricingClassIds);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
-		findByA_C_C_Order(
-			long commerceAccountId, String commerceDiscountTargetType);
-
-	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		findByAG_C_C_Product(
 			long[] commerceAccountGroupIds, long cpDefinitionId,
 			long[] assetCategoryIds, long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByUnqualifiedSku(
+			long companyId, long cpInstanceId, long[] assetCategoryIds,
+			long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByA_C_C_Sku(
+			long commerceAccountId, long cpInstanceId, long[] assetCategoryIds,
+			long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByAG_C_C_Sku(
+			long[] commerceAccountGroupIds, long cpDefinitionId,
+			long[] assetCategoryIds, long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByA_C_C_Order(
+			long commerceAccountId, String commerceDiscountTargetType);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		findByAG_C_C_Order(
@@ -75,12 +86,22 @@ public interface CommerceDiscountFinder {
 			long[] assetCategoryIds, long[] commercePricingClassIds);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByC_C_C_Sku(
+			long commerceChannelId, long cpInstanceId, long[] assetCategoryIds,
+			long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		findByC_C_C_Order(
 			long commerceChannelId, String commerceDiscountTargetType);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		findByA_C_C_C_Product(
 			long commerceAccountId, long commerceChannelId, long cpDefinitionId,
+			long[] assetCategoryIds, long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByA_C_C_C_Sku(
+			long commerceAccountId, long commerceChannelId, long cpInstanceId,
 			long[] assetCategoryIds, long[] commercePricingClassIds);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
@@ -95,6 +116,12 @@ public interface CommerceDiscountFinder {
 			long[] commercePricingClassIds);
 
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByAG_C_C_C_Sku(
+			long[] commerceAccountGroupIds, long commerceChannelId,
+			long cpInstanceId, long[] assetCategoryIds,
+			long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		findByAG_C_C_C_Order(
 			long[] commerceAccountGroupIds, long commerceChannelId,
 			String commerceDiscountTargetType);
@@ -103,5 +130,9 @@ public interface CommerceDiscountFinder {
 		findPriceListDiscountProduct(
 			long[] commerceDiscountIds, long cpDefinitionId,
 			long[] assetCategoryIds, long[] commercePricingClassIds);
+
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		findByUnqualifiedOrder(
+			long companyId, String commerceDiscountTargetType);
 
 }

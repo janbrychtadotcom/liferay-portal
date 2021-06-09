@@ -21,6 +21,7 @@ import com.liferay.commerce.discount.model.impl.CommerceDiscountImpl;
 import com.liferay.commerce.discount.service.persistence.CommerceDiscountFinder;
 import com.liferay.commerce.pricing.model.CommercePricingClass;
 import com.liferay.commerce.product.model.CPDefinition;
+import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.dao.orm.custom.sql.CustomSQL;
@@ -312,15 +313,6 @@ public class CommerceDiscountFinderImpl
 	}
 
 	@Override
-	public List<CommerceDiscount> findByUnqualifiedOrder(
-		long companyId, String commerceDiscountTargetType) {
-
-		return _findOrderDiscounts(
-			FIND_BY_UNQUALIFIED_ORDER, companyId, null, null, null,
-			commerceDiscountTargetType);
-	}
-
-	@Override
 	public List<CommerceDiscount> findByA_C_C_Product(
 		long commerceAccountId, long cpDefinitionId, long[] assetCategoryIds,
 		long[] commercePricingClassIds) {
@@ -328,15 +320,6 @@ public class CommerceDiscountFinderImpl
 		return _findProductDiscount(
 			FIND_BY_A_C_C_PRODUCT, null, commerceAccountId, null, -1L,
 			cpDefinitionId, assetCategoryIds, commercePricingClassIds);
-	}
-
-	@Override
-	public List<CommerceDiscount> findByA_C_C_Order(
-		long commerceAccountId, String commerceDiscountTargetType) {
-
-		return _findOrderDiscounts(
-			FIND_BY_A_C_C_ORDER, null, commerceAccountId, null, -1L,
-			commerceDiscountTargetType);
 	}
 
 	@Override
@@ -348,6 +331,54 @@ public class CommerceDiscountFinderImpl
 			FIND_BY_AG_C_C_PRODUCT, null, null, commerceAccountGroupIds, -1L,
 			cpDefinitionId, assetCategoryIds, commercePricingClassIds);
 	}
+
+
+	@Override
+	public List<CommerceDiscount> findByUnqualifiedSku(
+		long companyId, long cpInstanceId, long[] assetCategoryIds,
+		long[] commercePricingClassIds) {
+
+		return _findSkuDiscount(
+			FIND_BY_UNQUALIFIED_PRODUCT, companyId, null, null, null,
+			cpInstanceId, assetCategoryIds, commercePricingClassIds);
+	}
+
+	@Override
+	public List<CommerceDiscount> findByA_C_C_Sku(
+		long commerceAccountId, long cpInstanceId, long[] assetCategoryIds,
+		long[] commercePricingClassIds) {
+
+		return _findSkuDiscount(
+			FIND_BY_A_C_C_PRODUCT, null, commerceAccountId, null, -1L,
+			cpInstanceId, assetCategoryIds, commercePricingClassIds);
+	}
+
+	@Override
+	public List<CommerceDiscount> findByAG_C_C_Sku(
+		long[] commerceAccountGroupIds, long cpDefinitionId,
+		long[] assetCategoryIds, long[] commercePricingClassIds) {
+
+		return _findSkuDiscount(
+			FIND_BY_AG_C_C_PRODUCT, null, null, commerceAccountGroupIds, -1L,
+			cpDefinitionId, assetCategoryIds, commercePricingClassIds);
+	}
+
+
+
+
+
+
+
+	@Override
+	public List<CommerceDiscount> findByA_C_C_Order(
+		long commerceAccountId, String commerceDiscountTargetType) {
+
+		return _findOrderDiscounts(
+			FIND_BY_A_C_C_ORDER, null, commerceAccountId, null, -1L,
+			commerceDiscountTargetType);
+	}
+
+
 
 	@Override
 	public List<CommerceDiscount> findByAG_C_C_Order(
@@ -366,6 +397,16 @@ public class CommerceDiscountFinderImpl
 		return _findProductDiscount(
 			FIND_BY_C_C_C_PRODUCT, null, null, null, commerceChannelId,
 			cpDefinitionId, assetCategoryIds, commercePricingClassIds);
+	}
+
+	@Override
+	public List<CommerceDiscount> findByC_C_C_Sku(
+		long commerceChannelId, long cpInstanceId, long[] assetCategoryIds,
+		long[] commercePricingClassIds) {
+
+		return _findSkuDiscount(
+			FIND_BY_C_C_C_PRODUCT, null, null, null, commerceChannelId,
+			cpInstanceId, assetCategoryIds, commercePricingClassIds);
 	}
 
 	@Override
@@ -389,6 +430,17 @@ public class CommerceDiscountFinderImpl
 	}
 
 	@Override
+	public List<CommerceDiscount> findByA_C_C_C_Sku(
+		long commerceAccountId, long commerceChannelId, long cpInstanceId,
+		long[] assetCategoryIds, long[] commercePricingClassIds) {
+
+		return _findSkuDiscount(
+			FIND_BY_A_C_C_C_PRODUCT, null, commerceAccountId, null,
+			commerceChannelId, cpInstanceId, assetCategoryIds,
+			commercePricingClassIds);
+	}
+
+	@Override
 	public List<CommerceDiscount> findByA_C_C_C_Order(
 		long commerceAccountId, long commerceChannelId,
 		String commerceDiscountTargetType) {
@@ -407,6 +459,18 @@ public class CommerceDiscountFinderImpl
 		return _findProductDiscount(
 			FIND_BY_AG_C_C_C_PRODUCT, null, null, commerceAccountGroupIds,
 			commerceChannelId, cpDefinitionId, assetCategoryIds,
+			commercePricingClassIds);
+	}
+
+	@Override
+	public List<CommerceDiscount> findByAG_C_C_C_Sku(
+		long[] commerceAccountGroupIds, long commerceChannelId,
+		long cpInstanceId, long[] assetCategoryIds,
+		long[] commercePricingClassIds) {
+
+		return _findSkuDiscount(
+			FIND_BY_AG_C_C_C_PRODUCT, null, null, commerceAccountGroupIds,
+			commerceChannelId, cpInstanceId, assetCategoryIds,
 			commercePricingClassIds);
 	}
 
@@ -489,6 +553,15 @@ public class CommerceDiscountFinderImpl
 		finally {
 			closeSession(session);
 		}
+	}
+
+	@Override
+	public List<CommerceDiscount> findByUnqualifiedOrder(
+		long companyId, String commerceDiscountTargetType) {
+
+		return _findOrderDiscounts(
+			FIND_BY_UNQUALIFIED_ORDER, companyId, null, null, null,
+			commerceDiscountTargetType);
 	}
 
 	protected String replaceQueryClassPKs(
@@ -614,6 +687,85 @@ public class CommerceDiscountFinderImpl
 			queryPos.add(cpDefinitionId);
 			queryPos.add(
 				PortalUtil.getClassNameId(CPDefinition.class.getName()));
+			queryPos.add(CommerceDiscountConstants.TARGET_CATEGORIES);
+			queryPos.add(
+				PortalUtil.getClassNameId(AssetCategory.class.getName()));
+			queryPos.add(CommerceDiscountConstants.TARGET_PRODUCT_GROUPS);
+			queryPos.add(
+				PortalUtil.getClassNameId(
+					CommercePricingClass.class.getName()));
+
+			return (List<CommerceDiscount>)QueryUtil.list(
+				sqlQuery, getDialect(), QueryUtil.ALL_POS, QueryUtil.ALL_POS);
+		}
+		catch (Exception exception) {
+			throw new SystemException(exception);
+		}
+		finally {
+			closeSession(session);
+		}
+	}
+
+	private List<CommerceDiscount> _findSkuDiscount(
+		String queryString, Long companyId, Long commerceAccountId,
+		long[] commerceAccountGroupIds, Long commerceChannelId,
+		long cpInstanceId, long[] assetCategoryIds,
+		long[] commercePricingClassIds) {
+
+		Session session = null;
+
+		try {
+			session = openSession();
+
+			String sql = _customSQL.get(getClass(), queryString);
+
+			if ((commerceAccountGroupIds != null) &&
+				(commerceAccountGroupIds.length > 0)) {
+
+				sql = replaceQueryClassPKs(
+					sql, "[$ACCOUNT_GROUP_IDS$]", commerceAccountGroupIds);
+			}
+			else {
+				sql = replaceQueryClassPKs(
+					sql, "[$ACCOUNT_GROUP_IDS$]", new long[] {0});
+			}
+
+			if ((assetCategoryIds != null) && (assetCategoryIds.length > 0)) {
+				sql = replaceQueryClassPKs(
+					sql, "[$CLASS_PK_CATEGORIES$]", assetCategoryIds);
+			}
+			else {
+				sql = replaceQueryClassPKs(
+					sql, "[$CLASS_PK_CATEGORIES$]", new long[] {0});
+			}
+
+			if ((commercePricingClassIds != null) &&
+				(commercePricingClassIds.length > 0)) {
+
+				sql = replaceQueryClassPKs(
+					sql, "[$CLASS_PK_PRICING_CLASSES$]",
+					commercePricingClassIds);
+			}
+			else {
+				sql = replaceQueryClassPKs(
+					sql, "[$CLASS_PK_PRICING_CLASSES$]", new long[] {0});
+			}
+
+			SQLQuery sqlQuery = session.createSynchronizedSQLQuery(sql);
+
+			sqlQuery.addEntity(
+				CommerceDiscountImpl.TABLE_NAME, CommerceDiscountImpl.class);
+
+			QueryPos queryPos = QueryPos.getInstance(sqlQuery);
+
+			queryPos = _setQueryPosDynamicParameters(
+				companyId, commerceAccountId, commerceAccountGroupIds,
+				commerceChannelId, queryPos);
+
+			queryPos.add(CommerceDiscountConstants.TARGET_SKUS);
+			queryPos.add(cpInstanceId);
+			queryPos.add(
+				PortalUtil.getClassNameId(CPInstance.class.getName()));
 			queryPos.add(CommerceDiscountConstants.TARGET_CATEGORIES);
 			queryPos.add(
 				PortalUtil.getClassNameId(AssetCategory.class.getName()));

@@ -34,6 +34,7 @@ import com.liferay.commerce.discount.target.CommerceDiscountTargetRegistry;
 import com.liferay.commerce.discount.util.comparator.CommerceDiscountCreateDateComparator;
 import com.liferay.commerce.pricing.service.CommercePricingClassLocalService;
 import com.liferay.commerce.product.model.CPDefinition;
+import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.log.Log;
@@ -481,12 +482,14 @@ public class CommerceDiscountLocalServiceImpl
 	}
 
 	@Override
-	public List<CommerceDiscount> getAccountAndChannelCommerceDiscounts(
-		long commerceAccountId, long commerceChannelId,
-		String commerceDiscountTargetType) {
+	public List<CommerceDiscount> getAccountAndChannelCommerceDiscountsBySku(
+		long commerceAccountId, long commerceChannelId, long cpInstanceId, long cpDefinitionId) {
 
-		return commerceDiscountFinder.findByA_C_C_C_Order(
-			commerceAccountId, commerceChannelId, commerceDiscountTargetType);
+		return commerceDiscountFinder.findByA_C_C_C_Sku(
+			commerceAccountId, commerceChannelId, cpInstanceId,
+			_getAssetCategoryIds(cpDefinitionId),
+			_commercePricingClassLocalService.
+				getCommercePricingClassByCPDefinition(cpDefinitionId));
 	}
 
 	@Override
@@ -501,11 +504,14 @@ public class CommerceDiscountLocalServiceImpl
 	}
 
 	@Override
-	public List<CommerceDiscount> getAccountCommerceDiscounts(
-		long commerceAccountId, String commerceDiscountTargetType) {
+	public List<CommerceDiscount> getAccountCommerceDiscountsBySku(
+		long commerceAccountId, long cpInstanceId, long cpDefinitionId) {
 
-		return commerceDiscountFinder.findByA_C_C_Order(
-			commerceAccountId, commerceDiscountTargetType);
+		return commerceDiscountFinder.findByA_C_C_Sku(
+			commerceAccountId, cpInstanceId,
+			_getAssetCategoryIds(cpDefinitionId),
+			_commercePricingClassLocalService.
+				getCommercePricingClassByCPDefinition(cpDefinitionId));
 	}
 
 	@Override
@@ -518,6 +524,35 @@ public class CommerceDiscountLocalServiceImpl
 			_getAssetCategoryIds(cpDefinitionId),
 			_commercePricingClassLocalService.
 				getCommercePricingClassByCPDefinition(cpDefinitionId));
+	}
+
+	@Override
+	public List<CommerceDiscount> getAccountGroupAndChannelCommerceDiscountBySku(
+		long[] commerceAccountGroupIds, long commerceChannelId,
+		long cpInstanceId, long cpDefinitionId) {
+
+		return commerceDiscountFinder.findByAG_C_C_C_Sku(
+			commerceAccountGroupIds, commerceChannelId, cpInstanceId,
+			_getAssetCategoryIds(cpDefinitionId),
+			_commercePricingClassLocalService.
+				getCommercePricingClassByCPDefinition(cpDefinitionId));
+	}
+
+	@Override
+	public List<CommerceDiscount> getAccountAndChannelCommerceDiscounts(
+		long commerceAccountId, long commerceChannelId,
+		String commerceDiscountTargetType) {
+
+		return commerceDiscountFinder.findByA_C_C_C_Order(
+			commerceAccountId, commerceChannelId, commerceDiscountTargetType);
+	}
+
+	@Override
+	public List<CommerceDiscount> getAccountCommerceDiscounts(
+		long commerceAccountId, String commerceDiscountTargetType) {
+
+		return commerceDiscountFinder.findByA_C_C_Order(
+			commerceAccountId, commerceDiscountTargetType);
 	}
 
 	@Override
@@ -536,6 +571,17 @@ public class CommerceDiscountLocalServiceImpl
 
 		return commerceDiscountFinder.findByAG_C_C_Product(
 			commerceAccountGroupIds, cpDefinitionId,
+			_getAssetCategoryIds(cpDefinitionId),
+			_commercePricingClassLocalService.
+				getCommercePricingClassByCPDefinition(cpDefinitionId));
+	}
+
+	@Override
+	public List<CommerceDiscount> getAccountGroupCommerceDiscountBySku(
+		long[] commerceAccountGroupIds, long cpInstanceId, long cpDefinitionId) {
+
+		return commerceDiscountFinder.findByAG_C_C_Sku(
+			commerceAccountGroupIds, cpInstanceId,
 			_getAssetCategoryIds(cpDefinitionId),
 			_commercePricingClassLocalService.
 				getCommercePricingClassByCPDefinition(cpDefinitionId));
@@ -572,6 +618,17 @@ public class CommerceDiscountLocalServiceImpl
 
 		return commerceDiscountFinder.findByC_C_C_Product(
 			commerceChannelId, cpDefinitionId,
+			_getAssetCategoryIds(cpDefinitionId),
+			_commercePricingClassLocalService.
+				getCommercePricingClassByCPDefinition(cpDefinitionId));
+	}
+
+	@Override
+	public List<CommerceDiscount> getChannelCommerceDiscountsBySku(
+		long commerceChannelId, long cpInstanceId, long cpDefinitionId) {
+
+		return commerceDiscountFinder.findByC_C_C_Sku(
+			commerceChannelId, cpInstanceId,
 			_getAssetCategoryIds(cpDefinitionId),
 			_commercePricingClassLocalService.
 				getCommercePricingClassByCPDefinition(cpDefinitionId));
@@ -630,6 +687,16 @@ public class CommerceDiscountLocalServiceImpl
 
 		return commerceDiscountFinder.findByUnqualifiedProduct(
 			companyId, cpDefinitionId, _getAssetCategoryIds(cpDefinitionId),
+			_commercePricingClassLocalService.
+				getCommercePricingClassByCPDefinition(cpDefinitionId));
+	}
+
+	@Override
+	public List<CommerceDiscount> getUnqualifiedCommerceDiscountsBySku(
+		long companyId, long cpInstanceId, long cpDefinitionId) {
+
+		return commerceDiscountFinder.findByUnqualifiedSku(
+			companyId, cpInstanceId, _getAssetCategoryIds(cpDefinitionId),
 			_commercePricingClassLocalService.
 				getCommercePricingClassByCPDefinition(cpDefinitionId));
 	}
@@ -1460,7 +1527,7 @@ public class CommerceDiscountLocalServiceImpl
 		}
 	}
 
-	private long[] _getAssetCategoryIds(long cpDefinitionId) {
+	private long[] _getAssetCategoryIds( long cpDefinitionId) {
 		try {
 			AssetEntry assetEntry = _assetEntryLocalService.getEntry(
 				CPDefinition.class.getName(), cpDefinitionId);

@@ -32,7 +32,6 @@ import com.liferay.commerce.pricing.constants.CommercePricingPortletKeys;
 import com.liferay.commerce.pricing.model.CommercePricingClass;
 import com.liferay.commerce.pricing.web.internal.constants.CommerceDiscountScreenNavigationConstants;
 import com.liferay.commerce.product.model.CPDefinition;
-import com.liferay.commerce.product.model.CPInstance;
 import com.liferay.frontend.taglib.clay.data.set.servlet.taglib.util.ClayDataSetActionDropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.CreationMenu;
 import com.liferay.petra.portlet.url.builder.PortletURLBuilder;
@@ -297,11 +296,6 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			getCommerceDiscountId() + "/discount-products?nestedFields=product";
 	}
 
-	public String getDiscountCPInstanceApiURL() throws PortalException {
-		return "/o/headless-commerce-admin-pricing/v2.0/discounts/" +
-			   getCommerceDiscountId() + "/discount-skus?nestedFields=sku";
-	}
-
 	public List<ClayDataSetActionDropdownItem>
 			getDiscountCPDefinitionClayDataSetActionDropdownItems()
 		throws PortalException {
@@ -323,8 +317,13 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 			false);
 	}
 
+	public String getDiscountCPInstanceApiURL() throws PortalException {
+		return "/o/headless-commerce-admin-pricing/v2.0/discounts/" +
+			getCommerceDiscountId() + "/discount-skus?nestedFields=sku";
+	}
+
 	public List<ClayDataSetActionDropdownItem>
-		getDiscountCPInstanceClayDataSetActionDropdownItems()
+			getDiscountCPInstanceClayDataSetActionDropdownItems()
 		throws PortalException {
 
 		return getClayHeadlessDataSetActionTemplates(
@@ -344,7 +343,6 @@ public class CommerceDiscountDisplayContext extends BasePricingDisplayContext {
 				"screenNavigationCategoryKey", "details"
 			).buildString(),
 			false);
-
 	}
 
 	public CreationMenu getDiscountCreationMenu() throws Exception {

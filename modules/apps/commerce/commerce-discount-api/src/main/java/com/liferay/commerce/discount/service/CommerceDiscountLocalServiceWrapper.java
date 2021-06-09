@@ -543,6 +543,18 @@ public class CommerceDiscountLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		getAccountAndChannelCommerceDiscountsBySku(
+			long commerceAccountId, long commerceChannelId, long cpInstanceId,
+			long cpDefinitionId) {
+
+		return _commerceDiscountLocalService.
+			getAccountAndChannelCommerceDiscountsBySku(
+				commerceAccountId, commerceChannelId, cpInstanceId,
+				cpDefinitionId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		getAccountCommerceDiscounts(
 			long commerceAccountId, long cpDefinitionId) {
 
@@ -557,6 +569,15 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.getAccountCommerceDiscounts(
 			commerceAccountId, commerceDiscountTargetType);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		getAccountCommerceDiscountsBySku(
+			long commerceAccountId, long cpInstanceId, long cpDefinitionId) {
+
+		return _commerceDiscountLocalService.getAccountCommerceDiscountsBySku(
+			commerceAccountId, cpInstanceId, cpDefinitionId);
 	}
 
 	@Override
@@ -584,6 +605,18 @@ public class CommerceDiscountLocalServiceWrapper
 
 	@Override
 	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		getAccountGroupAndChannelCommerceDiscountBySku(
+			long[] commerceAccountGroupIds, long commerceChannelId,
+			long cpInstanceId, long cpDefinitionId) {
+
+		return _commerceDiscountLocalService.
+			getAccountGroupAndChannelCommerceDiscountBySku(
+				commerceAccountGroupIds, commerceChannelId, cpInstanceId,
+				cpDefinitionId);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
 		getAccountGroupCommerceDiscount(
 			long[] commerceAccountGroupIds, long cpDefinitionId) {
 
@@ -598,6 +631,17 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.getAccountGroupCommerceDiscount(
 			commerceAccountGroupIds, commerceDiscountTargetType);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		getAccountGroupCommerceDiscountBySku(
+			long[] commerceAccountGroupIds, long cpInstanceId,
+			long cpDefinitionId) {
+
+		return _commerceDiscountLocalService.
+			getAccountGroupCommerceDiscountBySku(
+				commerceAccountGroupIds, cpInstanceId, cpDefinitionId);
 	}
 
 	@Override
@@ -641,6 +685,15 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.getChannelCommerceDiscounts(
 			commerceChannelId, commerceDiscountTargetType);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		getChannelCommerceDiscountsBySku(
+			long commerceChannelId, long cpInstanceId, long cpDefinitionId) {
+
+		return _commerceDiscountLocalService.getChannelCommerceDiscountsBySku(
+			commerceChannelId, cpInstanceId, cpDefinitionId);
 	}
 
 	/**
@@ -817,6 +870,16 @@ public class CommerceDiscountLocalServiceWrapper
 
 		return _commerceDiscountLocalService.getUnqualifiedCommerceDiscounts(
 			companyId, commerceDiscountTargetType);
+	}
+
+	@Override
+	public java.util.List<com.liferay.commerce.discount.model.CommerceDiscount>
+		getUnqualifiedCommerceDiscountsBySku(
+			long companyId, long cpInstanceId, long cpDefinitionId) {
+
+		return _commerceDiscountLocalService.
+			getUnqualifiedCommerceDiscountsBySku(
+				companyId, cpInstanceId, cpDefinitionId);
 	}
 
 	@Override

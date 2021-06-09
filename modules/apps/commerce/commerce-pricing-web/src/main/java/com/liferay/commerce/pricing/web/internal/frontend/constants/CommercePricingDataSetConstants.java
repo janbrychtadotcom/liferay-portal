@@ -31,10 +31,6 @@ public class CommercePricingDataSetConstants {
 			"commerceDiscountProductDefinitions";
 
 	public static final String
-		COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS =
-			"commerceDiscountSkus";
-
-	public static final String
 		COMMERCE_DATA_SET_KEY_DISCOUNT_QUALIFIER_ACCOUNT_GROUPS =
 			"commerceDiscountQualifierAccountGroups";
 
@@ -52,6 +48,9 @@ public class CommercePricingDataSetConstants {
 
 	public static final String COMMERCE_DATA_SET_KEY_DISCOUNT_RULES =
 		"commerceDiscountRules";
+
+	public static final String COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS =
+		"commerceDiscountSkus";
 
 	public static final String COMMERCE_DATA_SET_KEY_DISCOUNTS =
 		"commerceDiscounts";

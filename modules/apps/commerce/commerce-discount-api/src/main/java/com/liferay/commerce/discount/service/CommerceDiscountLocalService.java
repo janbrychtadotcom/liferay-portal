@@ -383,12 +383,21 @@ public interface CommerceDiscountLocalService
 		String commerceDiscountTargetType);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscount> getAccountAndChannelCommerceDiscountsBySku(
+		long commerceAccountId, long commerceChannelId, long cpInstanceId,
+		long cpDefinitionId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getAccountCommerceDiscounts(
 		long commerceAccountId, long cpDefinitionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getAccountCommerceDiscounts(
 		long commerceAccountId, String commerceDiscountTargetType);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscount> getAccountCommerceDiscountsBySku(
+		long commerceAccountId, long cpInstanceId, long cpDefinitionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getAccountGroupAndChannelCommerceDiscount(
@@ -401,12 +410,22 @@ public interface CommerceDiscountLocalService
 		String commerceDiscountTargetType);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscount>
+		getAccountGroupAndChannelCommerceDiscountBySku(
+			long[] commerceAccountGroupIds, long commerceChannelId,
+			long cpInstanceId, long cpDefinitionId);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getAccountGroupCommerceDiscount(
 		long[] commerceAccountGroupIds, long cpDefinitionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getAccountGroupCommerceDiscount(
 		long[] commerceAccountGroupIds, String commerceDiscountTargetType);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscount> getAccountGroupCommerceDiscountBySku(
+		long[] commerceAccountGroupIds, long cpInstanceId, long cpDefinitionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public ActionableDynamicQuery getActionableDynamicQuery();
@@ -427,6 +446,10 @@ public interface CommerceDiscountLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getChannelCommerceDiscounts(
 		long commerceChannelId, String commerceDiscountTargetType);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscount> getChannelCommerceDiscountsBySku(
+		long commerceChannelId, long cpInstanceId, long cpDefinitionId);
 
 	/**
 	 * Returns the commerce discount with the primary key.
@@ -539,6 +562,10 @@ public interface CommerceDiscountLocalService
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public List<CommerceDiscount> getUnqualifiedCommerceDiscounts(
 		long companyId, String commerceDiscountTargetType);
+
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public List<CommerceDiscount> getUnqualifiedCommerceDiscountsBySku(
+		long companyId, long cpInstanceId, long cpDefinitionId);
 
 	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
 	public int getValidCommerceDiscountsCount(

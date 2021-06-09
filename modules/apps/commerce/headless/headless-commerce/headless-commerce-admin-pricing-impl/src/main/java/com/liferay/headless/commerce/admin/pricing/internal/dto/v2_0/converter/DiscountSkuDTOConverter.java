@@ -67,11 +67,12 @@ public class DiscountSkuDTOConverter
 					commerceDiscount.getExternalReferenceCode();
 				discountId = commerceDiscount.getCommerceDiscountId();
 				discountSkuId = commerceDiscountRel.getCommerceDiscountRelId();
-				skuExternalReferenceCode = cpInstance.getExternalReferenceCode();
+				skuExternalReferenceCode =
+					cpInstance.getExternalReferenceCode();
 				skuId = cpInstance.getCPInstanceId();
-				productName= LanguageUtils.getLanguageIdMap(
-					cpDefinition.getNameMap());
 				productId = cpDefinition.getCPDefinitionId();
+				productName = LanguageUtils.getLanguageIdMap(
+					cpDefinition.getNameMap());
 			}
 		};
 	}

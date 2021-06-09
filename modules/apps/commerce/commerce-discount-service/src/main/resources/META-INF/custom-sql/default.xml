@@ -440,6 +440,7 @@
 				)
 		]]>
 	</sql>
+
 	<sql id="com.liferay.commerce.discount.service.persistence.CommerceDiscountFinder.findByA_C_C_C_Order">
 		<![CDATA[
 			SELECT

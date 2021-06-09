@@ -70,7 +70,6 @@ public class DiscountProductDTOConverter
 				productExternalReferenceCode =
 					cProduct.getExternalReferenceCode();
 				productId = cProduct.getCProductId();
-
 			}
 		};
 	}

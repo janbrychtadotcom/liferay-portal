@@ -29,18 +29,18 @@
 					'<%= HtmlUtil.escapeJS(commerceDiscount.getExternalReferenceCode()) %>';
 
 				function selectItem(sku) {
-
 					var skuData = {
 						discountExternalReferenceCode: discountExternalReferenceCode,
 						discountId: id,
+						skuExternalReferenceCode: sku.externalReferenceCode,
 						skuId: sku.id,
 					};
 
 					return CommerceDiscountSkusResource.addDiscountSku(id, skuData)
-						.then(() => {discountSkuAPI
+						.then(() => {
 							Liferay.fire(events.UPDATE_DATASET_DISPLAY, {
 								id:
-									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS  %>',
+									'<%= CommercePricingDataSetConstants.COMMERCE_DATA_SET_KEY_DISCOUNT_SKUS %>',
 							});
 						})
 						.catch((error) => {
@@ -77,7 +77,6 @@
 						{
 							fieldName: 'sku',
 						},
-
 					],
 					spritemap: '<%= themeDisplay.getPathThemeImages() %>/lexicon/icons.svg',
 					titleLabel: '<%= LanguageUtil.get(request, "add-existing-sku") %>',
@@ -85,14 +84,11 @@
 			</aui:script>
 		</div>
 
-
 		<div class="col-12">
 			<commerce-ui:panel
 				bodyClasses="p-0"
 				title='<%= LanguageUtil.get(request, "skus") %>'
 			>
-
-
 				<clay:headless-data-set-display
 					apiURL="<%= commerceDiscountDisplayContext.getDiscountCPInstanceApiURL() %>"
 					clayDataSetActionDropdownItems="<%= commerceDiscountDisplayContext.getDiscountCPInstanceClayDataSetActionDropdownItems() %>"
@@ -104,8 +100,6 @@
 					portletURL="<%= portletDiscountRuleURL %>"
 				/>
 			</commerce-ui:panel>
-
 		</div>
-
 	</div>
 </c:if>

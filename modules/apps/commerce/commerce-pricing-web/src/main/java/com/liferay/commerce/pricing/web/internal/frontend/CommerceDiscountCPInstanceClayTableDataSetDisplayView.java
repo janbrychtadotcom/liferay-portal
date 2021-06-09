@@ -21,7 +21,7 @@ import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchema;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilder;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaBuilderFactory;
 import com.liferay.frontend.taglib.clay.data.set.view.table.ClayTableSchemaField;
-import com.liferay.petra.string.StringPool;
+
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
@@ -42,13 +42,12 @@ public class CommerceDiscountCPInstanceClayTableDataSetDisplayView
 			_clayTableSchemaBuilderFactory.create();
 
 		ClayTableSchemaField skuField =
-			clayTableSchemaBuilder.addClayTableSchemaField(
-				"sku.name", "sku");
+			clayTableSchemaBuilder.addClayTableSchemaField("sku.name", "sku");
 
 		skuField.setContentRenderer("actionLink");
 
-		clayTableSchemaBuilder.addClayTableSchemaField("productName.LANG", "product");
-
+		clayTableSchemaBuilder.addClayTableSchemaField(
+			"productName.LANG", "product");
 
 		return clayTableSchemaBuilder.build();
 	}
