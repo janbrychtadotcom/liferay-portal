@@ -14,6 +14,7 @@
 
 package com.liferay.commerce.checkout.web.internal.util;
 
+import com.liferay.commerce.checkout.helper.CommerceCheckoutStepHelper;
 import com.liferay.commerce.checkout.web.internal.display.context.OrderSummaryCheckoutStepDisplayContext;
 import com.liferay.commerce.constants.CommerceCheckoutWebKeys;
 import com.liferay.commerce.discount.exception.CommerceDiscountLimitationTimesException;
@@ -248,7 +249,7 @@ public class OrderSummaryCommerceCheckoutStep extends BaseCommerceCheckoutStep {
 		if ((commerceOrder.getBillingAddressId() <= 0) &&
 			_commerceCheckoutStepHelper.
 				isActiveBillingAddressCommerceCheckoutStep(
-					httpServletRequest)) {
+					httpServletRequest, commerceOrder)) {
 
 			throw new CommerceOrderBillingAddressException();
 		}
@@ -266,7 +267,8 @@ public class OrderSummaryCommerceCheckoutStep extends BaseCommerceCheckoutStep {
 
 		if (commercePaymentMethodKey.isEmpty() &&
 			_commerceCheckoutStepHelper.
-				isActivePaymentMethodCommerceCheckoutStep(httpServletRequest)) {
+				isActivePaymentMethodCommerceCheckoutStep(
+					httpServletRequest, commerceOrder)) {
 
 			throw new CommerceOrderPaymentMethodException();
 		}
