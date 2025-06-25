@@ -177,7 +177,7 @@ public class CommerceCartContentDisplayContext {
 		return cpInstanceHelper.getCPInstanceImageFileVersion(
 			CommerceUtil.getCommerceAccountId(commerceContext),
 			_portal.getCompanyId(_httpServletRequest),
-			commerceOrderItem.getCPInstanceId());
+			commerceOrderItem.getCPInstanceId(), false);
 	}
 
 	public String getDeleteURL(CommerceOrderItem commerceOrderItem) {

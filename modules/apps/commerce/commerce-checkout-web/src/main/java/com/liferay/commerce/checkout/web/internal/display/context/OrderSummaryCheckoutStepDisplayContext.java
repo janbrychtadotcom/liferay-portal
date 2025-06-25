@@ -228,7 +228,7 @@ public class OrderSummaryCheckoutStepDisplayContext {
 		return _cpInstanceHelper.getCPInstanceImageFileVersion(
 			CommerceUtil.getCommerceAccountId(_commerceContext),
 			_portal.getCompanyId(_httpServletRequest),
-			commerceOrderItem.getCPInstanceId());
+			commerceOrderItem.getCPInstanceId(), false);
 	}
 
 	public String getDeliveryTermEntryName(Locale locale) {

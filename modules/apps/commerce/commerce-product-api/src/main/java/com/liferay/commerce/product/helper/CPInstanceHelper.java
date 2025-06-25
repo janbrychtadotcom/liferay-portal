@@ -97,7 +97,8 @@ public interface CPInstanceHelper {
 		getCPInstanceCPInstanceOptionValueRels(long cpInstanceId);
 
 	public FileVersion getCPInstanceImageFileVersion(
-			long commerceAccountId, long companyId, long cpInstanceId)
+			long commerceAccountId, long companyId, long cpInstanceId,
+			boolean secure)
 		throws Exception;
 
 	public String getCPInstanceThumbnailSrc(

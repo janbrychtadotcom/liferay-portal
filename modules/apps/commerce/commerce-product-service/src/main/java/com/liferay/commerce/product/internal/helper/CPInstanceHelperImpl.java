@@ -409,7 +409,7 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 		throws Exception {
 
 		FileVersion fileVersion = getCPInstanceImageFileVersion(
-			commerceAccountId, companyId, cpInstanceId);
+			commerceAccountId, companyId, cpInstanceId, false);
 
 		String originalImgTag = StringBundler.concat(
 			"<img alt=\"thumbnail\" class=\"aspect-ratio-bg-cover ",
@@ -559,7 +559,8 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 
 	@Override
 	public FileVersion getCPInstanceImageFileVersion(
-			long commerceAccountId, long companyId, long cpInstanceId)
+			long commerceAccountId, long companyId, long cpInstanceId,
+			boolean secure)
 		throws Exception {
 
 		CPInstance cpInstance = _cpInstanceLocalService.fetchCPInstance(
@@ -572,7 +573,8 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
 			cpInstance.getCPDefinitionId());
 
-		if (!_commerceProductViewPermission.contains(
+		if (secure &&
+			!_commerceProductViewPermission.contains(
 				PermissionThreadLocal.getPermissionChecker(), commerceAccountId,
 				cpDefinition.getCPDefinitionId())) {
 
@@ -646,13 +648,15 @@ public class CPInstanceHelperImpl implements CPInstanceHelper {
 		if (cpAttachmentFileEntries.isEmpty()) {
 			CPDefinition cpDefinition = cpInstance.getCPDefinition();
 
-			return cpDefinition.getDefaultImageThumbnailSrc(commerceAccountId);
+			return cpDefinition.
+				getDefaultImageThumbnailSrcWithoutPermissionCheck(
+					commerceAccountId);
 		}
 
 		CPAttachmentFileEntry cpAttachmentFileEntry =
 			cpAttachmentFileEntries.get(0);
 
-		return _commerceMediaResolver.getThumbnailURL(
+		return _commerceMediaResolver.getThumbnailURLWithoutPermissionCheck(
 			commerceAccountId,
 			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 	}
