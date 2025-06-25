@@ -589,6 +589,13 @@ public class CPDefinitionWrapper
 		return model.getDefaultImageThumbnailSrc(commerceAccountId);
 	}
 
+	@Override
+	public String getDefaultImageThumbnailSrcWithoutPermissionCheck(
+		long commerceAccountId) throws Exception {
+
+		return model.getDefaultImageThumbnailSrcWithoutPermissionCheck(commerceAccountId);
+	}
+
 	/**
 	 * Returns the default language ID of this cp definition.
 	 *

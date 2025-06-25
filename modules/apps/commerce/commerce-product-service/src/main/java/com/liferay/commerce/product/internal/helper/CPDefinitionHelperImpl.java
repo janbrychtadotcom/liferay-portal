@@ -90,27 +90,18 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 			Locale locale)
 		throws PortalException {
 
-		_commerceProductViewPermission.check(
-			PermissionThreadLocal.getPermissionChecker(), commerceAccountId,
-			groupId, cpDefinitionId);
+		return _getCPCatalogEntry(
+			commerceAccountId, groupId, cpDefinitionId, locale, true);
+	}
 
-		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
-			cpDefinitionId);
+	@Override
+	public CPCatalogEntry getCPCatalogEntryWithoutPermissionCheck(
+			long commerceAccountId, long groupId, long cpDefinitionId,
+			Locale locale)
+		throws PortalException {
 
-		CommerceContext commerceContext = CommerceContextThreadLocal.get();
-
-		if (!cpDefinition.isApproved() || !cpDefinition.isPublished() ||
-			(FeatureFlagManagerUtil.isEnabled("LPD-10889") &&
-			 !cpDefinition.isVisible(
-				 commerceContext.getCPConfigurationListId(
-					 cpDefinition.getGroupId())))) {
-
-			return null;
-		}
-
-		return new DatabaseCPCatalogEntryImpl(
-			cpDefinition, _cpDefinitionOptionRelLocalService, _cpInstanceHelper,
-			_cpInstanceLocalService, locale);
+		return _getCPCatalogEntry(
+			commerceAccountId, groupId, cpDefinitionId, locale, false);
 	}
 
 	@Override
@@ -253,6 +244,36 @@ public class CPDefinitionHelperImpl implements CPDefinitionHelper {
 		}
 
 		return ArrayUtil.toLongArray(channelGroupIds);
+	}
+
+	private CPCatalogEntry _getCPCatalogEntry(
+			long commerceAccountId, long groupId, long cpDefinitionId,
+			Locale locale, boolean permissionCheck)
+		throws PortalException {
+
+		if (permissionCheck) {
+			_commerceProductViewPermission.check(
+				PermissionThreadLocal.getPermissionChecker(), commerceAccountId,
+				groupId, cpDefinitionId);
+		}
+
+		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
+			cpDefinitionId);
+
+		CommerceContext commerceContext = CommerceContextThreadLocal.get();
+
+		if (!cpDefinition.isApproved() || !cpDefinition.isPublished() ||
+			(FeatureFlagManagerUtil.isEnabled("LPD-10889") &&
+			 !cpDefinition.isVisible(
+				 commerceContext.getCPConfigurationListId(
+					 cpDefinition.getGroupId())))) {
+
+			return null;
+		}
+
+		return new DatabaseCPCatalogEntryImpl(
+			cpDefinition, _cpDefinitionOptionRelLocalService, _cpInstanceHelper,
+			_cpInstanceLocalService, locale);
 	}
 
 	private CPDefinitionSearcher _getCPDefinitionSearcher(

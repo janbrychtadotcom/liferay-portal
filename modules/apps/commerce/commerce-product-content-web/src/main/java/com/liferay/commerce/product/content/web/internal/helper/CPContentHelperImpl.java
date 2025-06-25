@@ -307,36 +307,17 @@ public class CPContentHelperImpl implements CPContentHelper {
 			long cpDefinitionId, HttpServletRequest httpServletRequest)
 		throws Exception {
 
-		if (!_commerceProductViewPermission.contains(
-				PermissionThreadLocal.getPermissionChecker(),
-				CommerceUtil.getCommerceAccountId(
-					(CommerceContext)httpServletRequest.getAttribute(
-						CommerceWebKeys.COMMERCE_CONTEXT)),
-				cpDefinitionId)) {
+		return _getCPDefinitionImageFileVersion(
+			cpDefinitionId, httpServletRequest, true);
+	}
 
-			return null;
-		}
+	@Override
+	public FileVersion getCPDefinitionImageFileVersionWithoutPermissionCheck(
+			long cpDefinitionId, HttpServletRequest httpServletRequest)
+		throws Exception {
 
-		CPAttachmentFileEntry cpAttachmentFileEntry =
-			_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
-				cpDefinitionId);
-
-		if (cpAttachmentFileEntry != null) {
-			FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
-
-			if (fileEntry != null) {
-				return fileEntry.getFileVersion();
-			}
-		}
-
-		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
-			cpDefinitionId);
-
-		FileEntry fileEntry = _commerceMediaProvider.getDefaultImageFileEntry(
-			_portal.getCompanyId(httpServletRequest),
-			cpDefinition.getGroupId());
-
-		return fileEntry.getFileVersion();
+		return _getCPDefinitionImageFileVersion(
+			cpDefinitionId, httpServletRequest, false);
 	}
 
 	@Override
@@ -849,6 +830,44 @@ public class CPContentHelperImpl implements CPContentHelper {
 				cpDefinitionOptionRel, cpInstanceId, false, null,
 				httpServletRequest, httpServletResponse);
 		}
+	}
+
+	private FileVersion _getCPDefinitionImageFileVersion(
+			long cpDefinitionId, HttpServletRequest httpServletRequest,
+			boolean permissionCheck)
+		throws Exception {
+
+		if (permissionCheck &&
+			!_commerceProductViewPermission.contains(
+				PermissionThreadLocal.getPermissionChecker(),
+				CommerceUtil.getCommerceAccountId(
+					(CommerceContext)httpServletRequest.getAttribute(
+						CommerceWebKeys.COMMERCE_CONTEXT)),
+				cpDefinitionId)) {
+
+			return null;
+		}
+
+		CPAttachmentFileEntry cpAttachmentFileEntry =
+			_cpDefinitionLocalService.getDefaultImageCPAttachmentFileEntry(
+				cpDefinitionId);
+
+		if (cpAttachmentFileEntry != null) {
+			FileEntry fileEntry = cpAttachmentFileEntry.fetchFileEntry();
+
+			if (fileEntry != null) {
+				return fileEntry.getFileVersion();
+			}
+		}
+
+		CPDefinition cpDefinition = _cpDefinitionLocalService.getCPDefinition(
+			cpDefinitionId);
+
+		FileEntry fileEntry = _commerceMediaProvider.getDefaultImageFileEntry(
+			_portal.getCompanyId(httpServletRequest),
+			cpDefinition.getGroupId());
+
+		return fileEntry.getFileVersion();
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

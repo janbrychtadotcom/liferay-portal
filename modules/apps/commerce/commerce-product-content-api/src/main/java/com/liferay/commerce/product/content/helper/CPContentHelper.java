@@ -85,6 +85,10 @@ public interface CPContentHelper {
 			long cpDefinitionId, HttpServletRequest httpServletRequest)
 		throws Exception;
 
+	public FileVersion getCPDefinitionImageFileVersionWithoutPermissionCheck(
+			long cpDefinitionId, HttpServletRequest httpServletRequest)
+		throws Exception;
+
 	public List<CPDefinitionSpecificationOptionValue>
 			getCPDefinitionSpecificationOptionValues(long cpDefinitionId)
 		throws PortalException;

@@ -39,6 +39,10 @@ public interface CommerceMediaResolver {
 			long commerceAccountId, long cpAttachmentFileEntryId)
 		throws PortalException;
 
+	public String getThumbnailURLWithoutPermissionCheck(
+			long commerceAccountId, long cpAttachmentFileEntryId)
+		throws PortalException;
+
 	public String getURL(long commerceAccountId, long cpAttachmentFileEntryId)
 		throws PortalException;
 

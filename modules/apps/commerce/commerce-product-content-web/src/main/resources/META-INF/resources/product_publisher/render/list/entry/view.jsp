@@ -41,7 +41,7 @@ boolean hasMultipleCPSkus = cpContentHelper.hasMultipleCPSkus(cpCatalogEntry);
 						<liferay-adaptive-media:img
 							alt="thumbnail"
 							class="img-fluid product-card-picture"
-							fileVersion="<%= cpContentHelper.getCPDefinitionImageFileVersion(cpCatalogEntry.getCPDefinitionId(), request) %>"
+							fileVersion="<%= cpContentHelper.getCPDefinitionImageFileVersionWithoutPermissionCheck(cpCatalogEntry.getCPDefinitionId(), request) %>"
 						/>
 					</c:otherwise>
 				</c:choose>

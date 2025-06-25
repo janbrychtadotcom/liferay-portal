@@ -66,8 +66,9 @@ public class CompareCheckboxTag extends IncludeTag {
 				CPDefinitionLocalServiceUtil.getCPDefinition(
 					_cpCatalogEntry.getCPDefinitionId());
 
-			_pictureUrl = cpDefinition.getDefaultImageThumbnailSrc(
-				commerceAccountId);
+			_pictureUrl =
+				cpDefinition.getDefaultImageThumbnailSrcWithoutPermissionCheck(
+					commerceAccountId);
 		}
 		catch (Exception exception) {
 			_log.error(exception);

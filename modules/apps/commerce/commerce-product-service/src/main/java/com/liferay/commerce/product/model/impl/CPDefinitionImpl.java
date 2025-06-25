@@ -254,17 +254,15 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 	public String getDefaultImageThumbnailSrc(long commerceAccountId)
 		throws Exception {
 
-		CPAttachmentFileEntry cpAttachmentFileEntry =
-			CPDefinitionLocalServiceUtil.getDefaultImageCPAttachmentFileEntry(
-				getCPDefinitionId());
+		return _getDefaultImageThumbnailSrc(commerceAccountId, true);
+	}
 
-		if (cpAttachmentFileEntry == null) {
-			return CommerceMediaResolverUtil.getDefaultURL(getGroupId());
-		}
+	@Override
+	public String getDefaultImageThumbnailSrcWithoutPermissionCheck(
+			long commerceAccountId)
+		throws Exception {
 
-		return CommerceMediaResolverUtil.getThumbnailURL(
-			commerceAccountId,
-			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
+		return _getDefaultImageThumbnailSrc(commerceAccountId, false);
 	}
 
 	@Override
@@ -555,6 +553,29 @@ public class CPDefinitionImpl extends CPDefinitionBaseImpl {
 		}
 
 		return null;
+	}
+
+	private String _getDefaultImageThumbnailSrc(
+			long commerceAccountId, boolean secure)
+		throws Exception {
+
+		CPAttachmentFileEntry cpAttachmentFileEntry =
+			CPDefinitionLocalServiceUtil.getDefaultImageCPAttachmentFileEntry(
+				getCPDefinitionId());
+
+		if (cpAttachmentFileEntry == null) {
+			return CommerceMediaResolverUtil.getDefaultURL(getGroupId());
+		}
+
+		if (secure) {
+			return CommerceMediaResolverUtil.getThumbnailURL(
+				commerceAccountId,
+				cpAttachmentFileEntry.getCPAttachmentFileEntryId());
+		}
+
+		return CommerceMediaResolverUtil.getThumbnailURLWithoutPermissionCheck(
+			commerceAccountId,
+			cpAttachmentFileEntry.getCPAttachmentFileEntryId());
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(

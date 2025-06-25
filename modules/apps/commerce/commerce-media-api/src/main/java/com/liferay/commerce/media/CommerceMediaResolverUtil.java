@@ -46,6 +46,17 @@ public class CommerceMediaResolverUtil {
 			commerceAccountId, cpAttachmentFileEntryId);
 	}
 
+	public static String getThumbnailURLWithoutPermissionCheck(
+			long commerceAccountId, long cpAttachmentFileEntryId)
+		throws PortalException {
+
+		CommerceMediaResolver commerceMediaResolver =
+			_serviceTracker.getService();
+
+		return commerceMediaResolver.getThumbnailURLWithoutPermissionCheck(
+			commerceAccountId, cpAttachmentFileEntryId);
+	}
+
 	public static String getURL(
 			long commerceAccountId, long cpAttachmentFileEntryId)
 		throws PortalException {

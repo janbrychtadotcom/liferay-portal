@@ -129,6 +129,15 @@ public class DefaultCommerceMediaResolver implements CommerceMediaResolver {
 	}
 
 	@Override
+	public String getThumbnailURLWithoutPermissionCheck(
+			long commerceAccountId, long cpAttachmentFileEntryId)
+		throws PortalException {
+
+		return getURL(
+			commerceAccountId, cpAttachmentFileEntryId, false, true, false);
+	}
+
+	@Override
 	public String getURL(long commerceAccountId, long cpAttachmentFileEntryId)
 		throws PortalException {
 

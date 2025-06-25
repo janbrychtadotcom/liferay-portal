@@ -58,6 +58,10 @@ public class AvailabilityLabelInfoItemRenderer
 		return _language.get(locale, "availability");
 	}
 
+	public boolean isPermissionCheck() {
+		return _permissionCheck;
+	}
+
 	@Override
 	public void render(
 		CPDefinition cpDefinition, HttpServletRequest httpServletRequest,
@@ -104,7 +108,7 @@ public class AvailabilityLabelInfoItemRenderer
 			long groupId = _portal.getScopeGroupId(httpServletRequest);
 
 			CPCatalogEntry cpCatalogEntry =
-				_cpDefinitionHelper.getCPCatalogEntry(
+				_cpDefinitionHelper.getCPCatalogEntryWithoutPermissionCheck(
 					_getCommerceAccountId(groupId, httpServletRequest), groupId,
 					cpDefinition.getCPDefinitionId(),
 					_portal.getLocale(httpServletRequest));
@@ -148,6 +152,10 @@ public class AvailabilityLabelInfoItemRenderer
 		}
 	}
 
+	public void setPermissionCheck(boolean permissionCheck) {
+		_permissionCheck = permissionCheck;
+	}
+
 	private long _getCommerceAccountId(
 			long groupId, HttpServletRequest httpServletRequest)
 		throws PortalException {
@@ -185,6 +193,8 @@ public class AvailabilityLabelInfoItemRenderer
 
 	@Reference
 	private Language _language;
+
+	private boolean _permissionCheck = true;
 
 	@Reference
 	private Portal _portal;

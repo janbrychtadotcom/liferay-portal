@@ -82,6 +82,9 @@ public interface CPDefinition extends CPDefinitionModel, PersistedModel {
 	public String getDefaultImageThumbnailSrc(long commerceAccountId)
 		throws Exception;
 
+	public String getDefaultImageThumbnailSrcWithoutPermissionCheck(long commerceAccountId)
+		throws Exception;
+
 	public com.liferay.portal.kernel.util.UnicodeProperties
 		getDeliverySubscriptionTypeSettingsUnicodeProperties();
 
