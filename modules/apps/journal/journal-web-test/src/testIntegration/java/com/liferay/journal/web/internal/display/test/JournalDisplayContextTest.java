@@ -120,23 +120,6 @@ public class JournalDisplayContextTest {
 	}
 
 	@Test
-	public void testGetSearchContainerWithDDMStructureAndRecentNavigation()
-		throws Exception {
-
-		JournalArticle journalArticleExample =
-			_createDataForRecentNavigationTests();
-
-		SearchContainer<Object> searchContainer = _getSearchContainer(
-			StringPool.BLANK, "all", true,
-			journalArticleExample.getDDMStructureId(),
-			SearchContainer.DEFAULT_CUR, SearchContainer.DEFAULT_DELTA);
-
-		List<Object> results = searchContainer.getResults();
-
-		Assert.assertEquals(results.toString(), 1, results.size());
-	}
-
-	@Test
 	public void testGetSearchContainerWithJournalFolderFixture()
 		throws Exception {
 
@@ -173,40 +156,20 @@ public class JournalDisplayContextTest {
 	}
 
 	@Test
-	public void testGetSearchContainerWithNavigationStructureAndDDMStructureAndRecentNavigation()
-		throws Exception {
+	public void testGetSearchContainerWithParameters() throws Exception {
+		new JournalFolderFixture(
+			_journalFolderLocalService
+		).addFolder(
+			_group.getGroupId(), "Journal Folder Example"
+		);
 
-		JournalArticle journalArticleExample =
-			_createDataForRecentNavigationTests();
+		_addJournalArticle("Journal Article Example 1");
 
-		SearchContainer<Object> searchContainer = _getSearchContainer(
-			StringPool.BLANK, "structure", true,
-			journalArticleExample.getDDMStructureId(),
-			SearchContainer.DEFAULT_CUR, SearchContainer.DEFAULT_DELTA);
+		JournalArticle journalArticle = _addJournalArticle(
+			"Journal Article Example 2");
 
-		List<Object> results = searchContainer.getResults();
-
-		Assert.assertEquals(results.toString(), 1, results.size());
-	}
-
-	@Test
-	public void testGetSearchContainerWithoutRecentNavigation()
-		throws Exception {
-
-		_createDataForRecentNavigationTests();
-
-		SearchContainer<Object> searchContainer = _getSearchContainer(
-			StringPool.BLANK, "all", false, 0, SearchContainer.DEFAULT_CUR,
-			SearchContainer.DEFAULT_DELTA);
-
-		List<Object> results = searchContainer.getResults();
-
-		Assert.assertEquals(results.toString(), 3, results.size());
-	}
-
-	@Test
-	public void testGetSearchContainerWithRecentNavigation() throws Exception {
-		_createDataForRecentNavigationTests();
+		// Set Request parameter navigation to default value all.
+		// Set Request parameter navigationRecent true.
 
 		SearchContainer<Object> searchContainer = _getSearchContainer(
 			StringPool.BLANK, "all", true, 0, SearchContainer.DEFAULT_CUR,
@@ -215,6 +178,44 @@ public class JournalDisplayContextTest {
 		List<Object> results = searchContainer.getResults();
 
 		Assert.assertEquals(results.toString(), 2, results.size());
+
+		// Set Request parameter navigation to default value all.
+		// Set Request parameter navigationRecent false.
+
+		searchContainer = _getSearchContainer(
+			StringPool.BLANK, "all", false, 0, SearchContainer.DEFAULT_CUR,
+			SearchContainer.DEFAULT_DELTA);
+
+		results = searchContainer.getResults();
+
+		Assert.assertEquals(results.toString(), 3, results.size());
+
+		// Set Request parameter navigation to default value all.
+		// Set Request parameter navigationRecent true.
+		// Set Request parameter highlightedDDMStructureId to journal article
+		// ddm structure id.
+
+		searchContainer = _getSearchContainer(
+			StringPool.BLANK, "all", true, journalArticle.getDDMStructureId(),
+			SearchContainer.DEFAULT_CUR, SearchContainer.DEFAULT_DELTA);
+
+		results = searchContainer.getResults();
+
+		Assert.assertEquals(results.toString(), 1, results.size());
+
+		// Set Request parameter navigation to structure.
+		// Set Request parameter navigationRecent true.
+		// Set Request parameter highlightedDDMStructureId to journal article
+		// ddm structure id.
+
+		searchContainer = _getSearchContainer(
+			StringPool.BLANK, "structure", true,
+			journalArticle.getDDMStructureId(), SearchContainer.DEFAULT_CUR,
+			SearchContainer.DEFAULT_DELTA);
+
+		results = searchContainer.getResults();
+
+		Assert.assertEquals(results.toString(), 1, results.size());
 	}
 
 	@Test
@@ -271,20 +272,6 @@ public class JournalDisplayContextTest {
 			true, _getLocaleStringMap(title),
 			_getLocaleStringMap("description"), _getLocaleStringMap("content"),
 			null, LocaleUtil.getDefault(), null, false, false, _serviceContext);
-	}
-
-	private JournalArticle _createDataForRecentNavigationTests()
-		throws Exception {
-
-		new JournalFolderFixture(
-			_journalFolderLocalService
-		).addFolder(
-			_group.getGroupId(), "Journal Folder Example"
-		);
-
-		_addJournalArticle("Journal Article Example 1");
-
-		return _addJournalArticle("Journal Article Example 2");
 	}
 
 	private Map<Locale, String> _getLocaleStringMap(String value) {
