@@ -204,6 +204,118 @@ public class JournalArticleInfoItemFieldValuesUpdaterTest {
 	}
 
 	@Test
+	public void testUpdateJournalArticleFromInfoItemFieldValuesPreservesEmptyIntermediateRepeatableField()
+		throws Exception {
+
+		JournalArticle journalArticle = _getRepeatableHtmlJournalArticle();
+
+		_translationEntryLocalService.addOrUpdateTranslationEntry(
+			_group.getGroupId(), JournalArticle.class.getName(),
+			journalArticle.getResourcePrimKey(),
+			StringUtil.replace(
+				TranslationTestUtil.readFileToString(
+					"test-journal-repeatable-html-empty-v12.xlf"),
+				"[$JOURNAL_ARTICLE_ID$]",
+				String.valueOf(journalArticle.getResourcePrimKey())),
+			"application/xliff+xml", LocaleUtil.toLanguageId(LocaleUtil.SPAIN),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		journalArticle = _journalArticleLocalService.fetchLatestArticle(
+			journalArticle.getResourcePrimKey());
+
+		List<DDMFormFieldValue> ddmFormFieldValues =
+			journalArticle.getDDMFormValues(
+			).getDDMFormFieldValuesMap(
+				true
+			).get(
+				"RichText"
+			);
+
+		Assert.assertEquals(
+			ddmFormFieldValues.toString(), 3, ddmFormFieldValues.size());
+		Assert.assertEquals(
+			"Valor A",
+			ddmFormFieldValues.get(
+				0
+			).getValue(
+			).getString(
+				LocaleUtil.SPAIN
+			));
+		Assert.assertEquals(
+			StringPool.BLANK,
+			ddmFormFieldValues.get(
+				1
+			).getValue(
+			).getString(
+				LocaleUtil.SPAIN
+			));
+		Assert.assertEquals(
+			"Valor C",
+			ddmFormFieldValues.get(
+				2
+			).getValue(
+			).getString(
+				LocaleUtil.SPAIN
+			));
+	}
+
+	@Test
+	public void testUpdateJournalArticleFromInfoItemFieldValuesPreservesEmptyIntermediateRepeatableTextField()
+		throws Exception {
+
+		JournalArticle journalArticle = _getRepeatableTextJournalArticle();
+
+		_translationEntryLocalService.addOrUpdateTranslationEntry(
+			_group.getGroupId(), JournalArticle.class.getName(),
+			journalArticle.getResourcePrimKey(),
+			StringUtil.replace(
+				TranslationTestUtil.readFileToString(
+					"test-journal-repeatable-text-empty-v12.xlf"),
+				"[$JOURNAL_ARTICLE_ID$]",
+				String.valueOf(journalArticle.getResourcePrimKey())),
+			"application/xliff+xml", LocaleUtil.toLanguageId(LocaleUtil.SPAIN),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		journalArticle = _journalArticleLocalService.fetchLatestArticle(
+			journalArticle.getResourcePrimKey());
+
+		List<DDMFormFieldValue> ddmFormFieldValues =
+			journalArticle.getDDMFormValues(
+			).getDDMFormFieldValuesMap(
+				true
+			).get(
+				"TextField"
+			);
+
+		Assert.assertEquals(
+			ddmFormFieldValues.toString(), 3, ddmFormFieldValues.size());
+		Assert.assertEquals(
+			"Valor A",
+			ddmFormFieldValues.get(
+				0
+			).getValue(
+			).getString(
+				LocaleUtil.SPAIN
+			));
+		Assert.assertEquals(
+			StringPool.BLANK,
+			ddmFormFieldValues.get(
+				1
+			).getValue(
+			).getString(
+				LocaleUtil.SPAIN
+			));
+		Assert.assertEquals(
+			"Valor C",
+			ddmFormFieldValues.get(
+				2
+			).getValue(
+			).getString(
+				LocaleUtil.SPAIN
+			));
+	}
+
+	@Test
 	public void testUpdateJournalArticleFromInfoItemFieldValuesUpdatesNewField()
 		throws Exception {
 
@@ -463,6 +575,48 @@ public class JournalArticleInfoItemFieldValuesUpdaterTest {
 			_group.getGroupId(),
 			TranslationTestUtil.readFileToString(
 				"test-journal-content-one-field.xml"),
+			ddmStructure.getStructureKey(), null);
+	}
+
+	private JournalArticle _getRepeatableHtmlJournalArticle() throws Exception {
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(
+				TranslationTestUtil.readFileToString(
+					"test-ddm-structure-repeatable-html.json"));
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				_ddmFormDeserializer.deserialize(builder.build());
+
+		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
+			_group.getGroupId(), JournalArticle.class.getName(),
+			ddmFormDeserializerDeserializeResponse.getDDMForm());
+
+		return JournalTestUtil.addArticleWithXMLContent(
+			_group.getGroupId(),
+			TranslationTestUtil.readFileToString(
+				"test-journal-content-repeatable-html-three-fields.xml"),
+			ddmStructure.getStructureKey(), null);
+	}
+
+	private JournalArticle _getRepeatableTextJournalArticle() throws Exception {
+		DDMFormDeserializerDeserializeRequest.Builder builder =
+			DDMFormDeserializerDeserializeRequest.Builder.newBuilder(
+				TranslationTestUtil.readFileToString(
+					"test-ddm-structure-repeatable-text.json"));
+
+		DDMFormDeserializerDeserializeResponse
+			ddmFormDeserializerDeserializeResponse =
+				_ddmFormDeserializer.deserialize(builder.build());
+
+		DDMStructure ddmStructure = DDMStructureTestUtil.addStructure(
+			_group.getGroupId(), JournalArticle.class.getName(),
+			ddmFormDeserializerDeserializeResponse.getDDMForm());
+
+		return JournalTestUtil.addArticleWithXMLContent(
+			_group.getGroupId(),
+			TranslationTestUtil.readFileToString(
+				"test-journal-content-repeatable-text-three-fields.xml"),
 			ddmStructure.getStructureKey(), null);
 	}
 
