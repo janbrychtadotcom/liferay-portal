@@ -5,6 +5,7 @@
 
 package com.liferay.object.info.item.util;
 
+import com.liferay.object.entry.util.ObjectEntryThreadLocal;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntryVersion;
 import com.liferay.object.model.ObjectField;
@@ -89,6 +90,11 @@ public class ObjectEntryInfoItemUtil {
 				"objectEntryVersion", objectEntryVersion);
 		}
 
+		boolean skipObjectEntryResourcePermission =
+			ObjectEntryThreadLocal.isSkipObjectEntryResourcePermission();
+
+		ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(true);
+
 		try {
 			if (serviceBuilderObjectEntry.isRootDescendantNode() &&
 				(objectEntryManager instanceof DefaultObjectEntryManager)) {
@@ -135,6 +141,10 @@ public class ObjectEntryInfoItemUtil {
 			}
 
 			return null;
+		}
+		finally {
+			ObjectEntryThreadLocal.setSkipObjectEntryResourcePermission(
+				skipObjectEntryResourcePermission);
 		}
 	}
 
