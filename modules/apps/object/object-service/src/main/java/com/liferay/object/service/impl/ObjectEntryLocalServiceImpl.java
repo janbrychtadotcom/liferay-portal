@@ -2794,6 +2794,9 @@ public class ObjectEntryLocalServiceImpl
 		_friendlyURLEntryLocalService.addFriendlyURLEntry(
 			groupId, classNameId, objectEntry.getObjectEntryId(),
 			objectEntry.getDefaultLanguageId(), urlTitleMap, serviceContext);
+
+		_syncAttachmentFileEntryFriendlyURLEntries(
+			objectDefinition, objectEntry, serviceContext, urlTitleMap, values);
 	}
 
 	private JoinStep _addInnerJoinON(
@@ -6960,6 +6963,115 @@ public class ObjectEntryLocalServiceImpl
 		WorkflowHandlerRegistryUtil.startWorkflowInstance(
 			objectEntry.getCompanyId(), objectEntry.getNonzeroGroupId(), userId,
 			className, objectEntry.getObjectEntryId(), objectEntry,
+			serviceContext);
+	}
+
+	/**
+	 * Mirrors an object entry's friendly URL onto the raw {@link FileEntry}
+	 * backing each of its attachment fields, so that the public
+	 * {@code /documents/d/...} URL (which resolves against the file entry's
+	 * own {@link FriendlyURLEntry}, not the object entry's) reflects the
+	 * friendly URL configured on the object entry.
+	 *
+	 * <p>
+	 * Only fields whose file source is {@link
+	 * ObjectFieldSettingConstants#VALUE_USER_COMPUTER_TO_DOCS_AND_MEDIA} are
+	 * synced, matching the ownership check {@link #_deleteFileEntries}
+	 * already uses to decide whether an attachment field exclusively owns
+	 * the life cycle of the file entry it references. Other file sources
+	 * (an existing library file or CMS document picked by reference) point
+	 * at a file entry some other record owns and already manages its own
+	 * friendly URL for, so mirroring here would overwrite it.
+	 * </p>
+	 */
+	private void _syncAttachmentFileEntryFriendlyURLEntries(
+			ObjectDefinition objectDefinition, ObjectEntry objectEntry,
+			ServiceContext serviceContext, Map<String, String> urlTitleMap,
+			Map<String, Serializable> values)
+		throws PortalException {
+
+		if (urlTitleMap.isEmpty()) {
+			return;
+		}
+
+		long fileEntryClassNameId = _classNameLocalService.getClassNameId(
+			FileEntry.class);
+
+		for (ObjectField objectField :
+				_objectFieldPersistence.findByObjectDefinitionId(
+					objectDefinition.getObjectDefinitionId())) {
+
+			if (!objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) ||
+				!Objects.equals(
+					ObjectFieldSettingUtil.getValue(
+						ObjectFieldSettingConstants.NAME_FILE_SOURCE,
+						objectField),
+					ObjectFieldSettingConstants.
+						VALUE_USER_COMPUTER_TO_DOCS_AND_MEDIA)) {
+
+				continue;
+			}
+
+			if (objectField.isLocalized()) {
+				Map<String, Serializable> localizedValues =
+					(Map<String, Serializable>)values.get(
+						objectField.getI18nObjectFieldName());
+
+				if (localizedValues == null) {
+					continue;
+				}
+
+				for (Map.Entry<String, String> urlTitleEntry :
+						urlTitleMap.entrySet()) {
+
+					String languageId = urlTitleEntry.getKey();
+
+					_syncFileEntryFriendlyURLEntry(
+						fileEntryClassNameId,
+						GetterUtil.getLong(localizedValues.get(languageId)),
+						languageId,
+						Collections.singletonMap(
+							languageId, urlTitleEntry.getValue()),
+						serviceContext);
+				}
+			}
+			else {
+				_syncFileEntryFriendlyURLEntry(
+					fileEntryClassNameId,
+					GetterUtil.getLong(values.get(objectField.getName())),
+					objectEntry.getDefaultLanguageId(), urlTitleMap,
+					serviceContext);
+			}
+		}
+	}
+
+	private void _syncFileEntryFriendlyURLEntry(
+			long fileEntryClassNameId, long dlFileEntryId,
+			String defaultLanguageId, Map<String, String> urlTitleMap,
+			ServiceContext serviceContext)
+		throws PortalException {
+
+		if (dlFileEntryId <= 0) {
+			return;
+		}
+
+		FileEntry fileEntry;
+
+		try {
+			fileEntry = _dlAppLocalService.getFileEntry(dlFileEntryId);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+
+			return;
+		}
+
+		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+			fileEntry.getGroupId(), fileEntryClassNameId,
+			fileEntry.getFileEntryId(), defaultLanguageId, urlTitleMap,
 			serviceContext);
 	}
 

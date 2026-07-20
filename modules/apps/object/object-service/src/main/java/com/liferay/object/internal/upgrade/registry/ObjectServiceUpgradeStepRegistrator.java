@@ -5,7 +5,9 @@
 
 package com.liferay.object.internal.upgrade.registry;
 
+import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.friendly.url.configuration.manager.FriendlyURLSeparatorConfigurationManager;
+import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.notification.service.NotificationTemplateLocalService;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
@@ -40,6 +42,9 @@ import com.liferay.object.internal.upgrade.v3_9_0.ObjectLayoutBoxUpgradeProcess;
 import com.liferay.object.internal.upgrade.v6_0_0.util.ObjectValidationRuleSettingTable;
 import com.liferay.object.internal.upgrade.v9_0_1.ObjectFolderUpgradeProcess;
 import com.liferay.object.model.impl.ObjectFieldSettingModelImpl;
+import com.liferay.object.service.ObjectDefinitionLocalService;
+import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.object.system.SystemObjectDefinitionManagerRegistry;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.service.ClassNameLocalService;
@@ -726,6 +731,15 @@ public class ObjectServiceUpgradeStepRegistrator
 			new com.liferay.object.internal.upgrade.v13_1_0.
 				ObjectDefinitionExternalReferenceCodeUpgradeProcess(
 					_systemObjectDefinitionManagerRegistry));
+
+		registry.register(
+			"13.1.0", "13.1.1",
+			new com.liferay.object.internal.upgrade.v13_1_1.
+				AttachmentFileEntryFriendlyURLUpgradeProcess(
+					_classNameLocalService, _companyLocalService,
+					_dlAppLocalService, _friendlyURLEntryLocalService,
+					_objectDefinitionLocalService, _objectEntryLocalService,
+					_objectFieldPersistence));
 	}
 
 	@Reference
@@ -733,6 +747,12 @@ public class ObjectServiceUpgradeStepRegistrator
 
 	@Reference
 	private CompanyLocalService _companyLocalService;
+
+	@Reference
+	private DLAppLocalService _dlAppLocalService;
+
+	@Reference
+	private FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
 
 	@Reference
 	private FriendlyURLSeparatorConfigurationManager
@@ -746,6 +766,15 @@ public class ObjectServiceUpgradeStepRegistrator
 
 	@Reference
 	private NotificationTemplateLocalService _notificationTemplateLocalService;
+
+	@Reference
+	private ObjectDefinitionLocalService _objectDefinitionLocalService;
+
+	@Reference
+	private ObjectEntryLocalService _objectEntryLocalService;
+
+	@Reference
+	private ObjectFieldPersistence _objectFieldPersistence;
 
 	@Reference
 	private ResourceActionLocalService _resourceActionLocalService;

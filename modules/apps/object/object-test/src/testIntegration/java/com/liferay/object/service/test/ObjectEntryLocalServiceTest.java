@@ -48,6 +48,7 @@ import com.liferay.exportimport.report.model.ExportImportReportEntry;
 import com.liferay.exportimport.report.service.ExportImportReportEntryLocalService;
 import com.liferay.exportimport.test.util.ExportImportConfigurationTemporarySwapper;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
+import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
 import com.liferay.list.type.entry.util.ListTypeEntryUtil;
 import com.liferay.list.type.model.ListTypeDefinition;
@@ -4336,6 +4337,86 @@ public class ObjectEntryLocalServiceTest {
 
 		_assertFriendlyURLEntries(0, siteObjectDefinition, siteObjectEntry1);
 		_assertFriendlyURLEntries(0, siteObjectDefinition, siteObjectEntry2);
+	}
+
+	@Test
+	public void testAddOrUpdateObjectEntryWithFriendlyURLAndAttachmentObjectField()
+		throws Exception {
+
+		_objectDefinition.setFriendlyURLSeparator("test-attachment");
+
+		_objectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition);
+
+		ObjectEntry objectEntry = _addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				"attachment", () -> _addDLFileEntry().getFileEntryId()
+			).put(
+				"emailAddressRequired", "athanasius@liferay.com"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		long dlFileEntryId = MapUtil.getLong(
+			objectEntry.getValues(), "attachment");
+
+		_assertFileEntryFriendlyURLEntries(
+			dlFileEntryId, objectEntry.getURLTitleMap());
+
+		objectEntry = _objectEntryLocalService.updateObjectEntry(
+			TestPropsValues.getUserId(), objectEntry.getObjectEntryId(),
+			objectEntry.getObjectEntryFolderId(),
+			HashMapBuilder.<String, Serializable>put(
+				"attachment", dlFileEntryId
+			).put(
+				"emailAddressRequired", "athanasius@liferay.com"
+			).put(
+				"externalReferenceCode", "renamed-document"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build(),
+			ServiceContextTestUtil.getServiceContext());
+
+		_assertFileEntryFriendlyURLEntries(
+			dlFileEntryId, objectEntry.getURLTitleMap());
+
+		_objectEntryLocalService.deleteObjectEntry(objectEntry);
+
+		Assert.assertNull(
+			_friendlyURLEntryLocalService.fetchMainFriendlyURLEntry(
+				_classNameLocalService.getClassNameId(FileEntry.class),
+				dlFileEntryId));
+	}
+
+	@Test
+	public void testAddOrUpdateObjectEntryWithFriendlyURLAndReferencedAttachmentObjectField()
+		throws Exception {
+
+		_objectDefinition.setFriendlyURLSeparator("test-referenced-attachment");
+
+		_objectDefinition =
+			_objectDefinitionLocalService.updateObjectDefinition(
+				_objectDefinition);
+
+		DLFileEntry dlFileEntry = _addDLFileEntry();
+
+		_addObjectEntry(
+			HashMapBuilder.<String, Serializable>put(
+				() -> _addAttachmentObjectField(
+					ObjectFieldSettingConstants.VALUE_DOCS_AND_MEDIA
+				).getName(),
+				dlFileEntry.getFileEntryId()
+			).put(
+				"emailAddressRequired", "athanasius@liferay.com"
+			).put(
+				"listTypeEntryKeyRequired", "listTypeEntryKey1"
+			).build());
+
+		Assert.assertNull(
+			_friendlyURLEntryLocalService.fetchMainFriendlyURLEntry(
+				_classNameLocalService.getClassNameId(FileEntry.class),
+				dlFileEntry.getFileEntryId()));
 	}
 
 	@Test
@@ -8875,6 +8956,31 @@ public class ObjectEntryLocalServiceTest {
 		_assertObjectValidationRuleResult(
 			objectValidationRule.getErrorLabel(LocaleUtil.getDefault()), null,
 			objectValidationRuleResults.get(0));
+	}
+
+	private void _assertFileEntryFriendlyURLEntries(
+			long dlFileEntryId, Map<String, String> expectedURLTitleMap)
+		throws Exception {
+
+		FriendlyURLEntry friendlyURLEntry =
+			_friendlyURLEntryLocalService.fetchMainFriendlyURLEntry(
+				_classNameLocalService.getClassNameId(FileEntry.class),
+				dlFileEntryId);
+
+		Assert.assertNotNull(friendlyURLEntry);
+
+		Map<String, String> urlTitleMap = new HashMap<>();
+
+		for (FriendlyURLEntryLocalization friendlyURLEntryLocalization :
+				_friendlyURLEntryLocalService.getFriendlyURLEntryLocalizations(
+					friendlyURLEntry.getFriendlyURLEntryId())) {
+
+			urlTitleMap.put(
+				friendlyURLEntryLocalization.getLanguageId(),
+				friendlyURLEntryLocalization.getUrlTitle());
+		}
+
+		AssertUtils.assertEquals(expectedURLTitleMap, urlTitleMap);
 	}
 
 	private void _assertFriendlyURLEntries(

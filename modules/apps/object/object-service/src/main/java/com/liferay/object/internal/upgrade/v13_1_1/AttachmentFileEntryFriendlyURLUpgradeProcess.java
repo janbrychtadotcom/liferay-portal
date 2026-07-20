@@ -3,16 +3,22 @@
  * SPDX-License-Identifier: LGPL-2.1-or-later OR LicenseRef-Liferay-DXP-EULA-2.0.0-2023-06
  */
 
-package com.liferay.site.cms.site.initializer.internal.upgrade.v4_0_0;
+package com.liferay.object.internal.upgrade.v13_1_1;
 
 import com.liferay.document.library.kernel.service.DLAppLocalService;
 import com.liferay.friendly.url.model.FriendlyURLEntry;
 import com.liferay.friendly.url.model.FriendlyURLEntryLocalization;
 import com.liferay.friendly.url.service.FriendlyURLEntryLocalService;
+import com.liferay.object.constants.ObjectFieldConstants;
+import com.liferay.object.constants.ObjectFieldSettingConstants;
+import com.liferay.object.definition.util.ObjectDefinitionUtil;
+import com.liferay.object.field.setting.util.ObjectFieldSettingUtil;
 import com.liferay.object.model.ObjectDefinition;
 import com.liferay.object.model.ObjectEntry;
+import com.liferay.object.model.ObjectField;
 import com.liferay.object.service.ObjectDefinitionLocalService;
 import com.liferay.object.service.ObjectEntryLocalService;
+import com.liferay.object.service.persistence.ObjectFieldPersistence;
 import com.liferay.petra.string.StringBundler;
 import com.liferay.portal.kernel.dao.orm.ActionableDynamicQuery;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
@@ -25,30 +31,37 @@ import com.liferay.portal.kernel.service.CompanyLocalService;
 import com.liferay.portal.kernel.service.ServiceContext;
 import com.liferay.portal.kernel.upgrade.UpgradeProcess;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.workflow.WorkflowConstants;
 
 import java.io.Serializable;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Backfills the friendly URL of the raw {@link FileEntry} a CMS "Basic
- * Document" object entry wraps (via its "file" attachment object field),
- * for object entries created or updated before the model listeners that
- * keep the two in sync started existing.
+ * Backfills the friendly URL of the raw {@link FileEntry} backing an
+ * attachment field, for object entries (of any object definition, not just
+ * CMS "Basic Document") created or updated before {@code
+ * ObjectEntryLocalServiceImpl} started keeping the two in sync.
  *
  * @author Jan Brychta
  */
-public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
+public class AttachmentFileEntryFriendlyURLUpgradeProcess
+	extends UpgradeProcess {
 
-	public CMSBasicDocumentFriendlyURLUpgradeProcess(
+	public AttachmentFileEntryFriendlyURLUpgradeProcess(
 		ClassNameLocalService classNameLocalService,
 		CompanyLocalService companyLocalService,
 		DLAppLocalService dlAppLocalService,
 		FriendlyURLEntryLocalService friendlyURLEntryLocalService,
 		ObjectDefinitionLocalService objectDefinitionLocalService,
-		ObjectEntryLocalService objectEntryLocalService) {
+		ObjectEntryLocalService objectEntryLocalService,
+		ObjectFieldPersistence objectFieldPersistence) {
 
 		_classNameLocalService = classNameLocalService;
 		_companyLocalService = companyLocalService;
@@ -56,11 +69,37 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 		_friendlyURLEntryLocalService = friendlyURLEntryLocalService;
 		_objectDefinitionLocalService = objectDefinitionLocalService;
 		_objectEntryLocalService = objectEntryLocalService;
+		_objectFieldPersistence = objectFieldPersistence;
 	}
 
 	@Override
 	protected void doUpgrade() throws Exception {
 		_companyLocalService.forEachCompanyId(this::_upgradeCompany);
+	}
+
+	private List<ObjectField> _getAttachmentObjectFields(
+		long objectDefinitionId) {
+
+		List<ObjectField> attachmentObjectFields = new ArrayList<>();
+
+		for (ObjectField objectField :
+				_objectFieldPersistence.findByObjectDefinitionId(
+					objectDefinitionId)) {
+
+			if (objectField.compareBusinessType(
+					ObjectFieldConstants.BUSINESS_TYPE_ATTACHMENT) &&
+				Objects.equals(
+					ObjectFieldSettingUtil.getValue(
+						ObjectFieldSettingConstants.NAME_FILE_SOURCE,
+						objectField),
+					ObjectFieldSettingConstants.
+						VALUE_USER_COMPUTER_TO_DOCS_AND_MEDIA)) {
+
+				attachmentObjectFields.add(objectField);
+			}
+		}
+
+		return attachmentObjectFields;
 	}
 
 	private boolean _isInSync(
@@ -89,15 +128,73 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 		return fileEntryUrlTitleMap.equals(urlTitleMap);
 	}
 
-	private void _upgradeCompany(long companyId) throws PortalException {
-		ObjectDefinition objectDefinition =
-			_objectDefinitionLocalService.
-				fetchObjectDefinitionByExternalReferenceCode(
-					"L_CMS_BASIC_DOCUMENT", companyId);
+	private boolean _syncFileEntry(
+			long fileEntryClassNameId, long dlFileEntryId,
+			String defaultLanguageId, Map<String, String> urlTitleMap)
+		throws PortalException {
 
-		if (objectDefinition == null) {
-			return;
+		if (dlFileEntryId <= 0) {
+			return false;
 		}
+
+		FileEntry fileEntry;
+
+		try {
+			fileEntry = _dlAppLocalService.getFileEntry(dlFileEntryId);
+		}
+		catch (PortalException portalException) {
+			if (_log.isDebugEnabled()) {
+				_log.debug(portalException);
+			}
+
+			return false;
+		}
+
+		if (_isInSync(fileEntryClassNameId, fileEntry, urlTitleMap)) {
+			return false;
+		}
+
+		_friendlyURLEntryLocalService.addFriendlyURLEntry(
+			fileEntry.getGroupId(), fileEntryClassNameId,
+			fileEntry.getFileEntryId(), defaultLanguageId, urlTitleMap,
+			new ServiceContext());
+
+		return true;
+	}
+
+	private void _upgradeCompany(long companyId) throws PortalException {
+		long fileEntryClassNameId = _classNameLocalService.getClassNameId(
+			FileEntry.class);
+
+		for (ObjectDefinition objectDefinition :
+				_objectDefinitionLocalService.getObjectDefinitions(
+					companyId, WorkflowConstants.STATUS_APPROVED)) {
+
+			if (ObjectDefinitionUtil.isDefaultFriendlyURLSeparator(
+					objectDefinition.getFriendlyURLSeparator())) {
+
+				continue;
+			}
+
+			List<ObjectField> attachmentObjectFields =
+				_getAttachmentObjectFields(
+					objectDefinition.getObjectDefinitionId());
+
+			if (attachmentObjectFields.isEmpty()) {
+				continue;
+			}
+
+			_upgradeObjectDefinition(
+				companyId, fileEntryClassNameId, objectDefinition,
+				attachmentObjectFields);
+		}
+	}
+
+	private void _upgradeObjectDefinition(
+			long companyId, long fileEntryClassNameId,
+			ObjectDefinition objectDefinition,
+			List<ObjectField> attachmentObjectFields)
+		throws PortalException {
 
 		long objectEntryClassNameId = _classNameLocalService.getClassNameId(
 			objectDefinition.getClassName());
@@ -117,7 +214,8 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 			(ObjectEntry objectEntry) -> {
 				try {
 					if (_upgradeObjectEntry(
-							objectEntry, objectEntryClassNameId)) {
+							fileEntryClassNameId, objectEntryClassNameId,
+							objectEntry, attachmentObjectFields)) {
 
 						syncedCount.incrementAndGet();
 					}
@@ -126,8 +224,8 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 					if (_log.isWarnEnabled()) {
 						_log.warn(
 							StringBundler.concat(
-								"Unable to sync the friendly URL of the file ",
-								"entry wrapped by CMS basic document ",
+								"Unable to sync the friendly URL of a file ",
+								"entry attached to object entry ",
 								objectEntry.getObjectEntryId(), " for company ",
 								companyId),
 							portalException);
@@ -141,22 +239,15 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 			_log.info(
 				StringBundler.concat(
 					"Synced the friendly URL of ", syncedCount.get(),
-					" file entries wrapped by CMS basic documents for company ",
-					companyId));
+					" file entries attached to object entries of object ",
+					"definition ", objectDefinition.getObjectDefinitionId()));
 		}
 	}
 
 	private boolean _upgradeObjectEntry(
-			ObjectEntry objectEntry, long objectEntryClassNameId)
+			long fileEntryClassNameId, long objectEntryClassNameId,
+			ObjectEntry objectEntry, List<ObjectField> attachmentObjectFields)
 		throws PortalException {
-
-		Map<String, Serializable> values = objectEntry.getValues();
-
-		long dlFileEntryId = GetterUtil.getLong(values.get("file"));
-
-		if (dlFileEntryId <= 0) {
-			return false;
-		}
 
 		FriendlyURLEntry friendlyURLEntry =
 			_friendlyURLEntryLocalService.fetchMainFriendlyURLEntry(
@@ -177,36 +268,54 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 				friendlyURLEntryLocalization.getUrlTitle());
 		}
 
-		FileEntry fileEntry;
-
-		try {
-			fileEntry = _dlAppLocalService.getFileEntry(dlFileEntryId);
+		if (urlTitleMap.isEmpty()) {
+			return false;
 		}
-		catch (PortalException portalException) {
-			if (_log.isDebugEnabled()) {
-				_log.debug(portalException);
+
+		Map<String, Serializable> values = objectEntry.getValues();
+
+		boolean synced = false;
+
+		for (ObjectField objectField : attachmentObjectFields) {
+			if (objectField.isLocalized()) {
+				Map<String, Serializable> localizedValues =
+					(Map<String, Serializable>)values.get(
+						objectField.getI18nObjectFieldName());
+
+				if (localizedValues == null) {
+					continue;
+				}
+
+				for (Map.Entry<String, String> urlTitleEntry :
+						urlTitleMap.entrySet()) {
+
+					String languageId = urlTitleEntry.getKey();
+
+					if (_syncFileEntry(
+							fileEntryClassNameId,
+							GetterUtil.getLong(localizedValues.get(languageId)),
+							languageId,
+							Collections.singletonMap(
+								languageId, urlTitleEntry.getValue()))) {
+
+						synced = true;
+					}
+				}
 			}
+			else if (_syncFileEntry(
+						fileEntryClassNameId,
+						GetterUtil.getLong(values.get(objectField.getName())),
+						friendlyURLEntry.getDefaultLanguageId(), urlTitleMap)) {
 
-			return false;
+				synced = true;
+			}
 		}
 
-		long fileEntryClassNameId = _classNameLocalService.getClassNameId(
-			FileEntry.class);
-
-		if (_isInSync(fileEntryClassNameId, fileEntry, urlTitleMap)) {
-			return false;
-		}
-
-		_friendlyURLEntryLocalService.addFriendlyURLEntry(
-			fileEntry.getGroupId(), fileEntryClassNameId,
-			fileEntry.getFileEntryId(), friendlyURLEntry.getDefaultLanguageId(),
-			urlTitleMap, new ServiceContext());
-
-		return true;
+		return synced;
 	}
 
 	private static final Log _log = LogFactoryUtil.getLog(
-		CMSBasicDocumentFriendlyURLUpgradeProcess.class);
+		AttachmentFileEntryFriendlyURLUpgradeProcess.class);
 
 	private final ClassNameLocalService _classNameLocalService;
 	private final CompanyLocalService _companyLocalService;
@@ -214,5 +323,6 @@ public class CMSBasicDocumentFriendlyURLUpgradeProcess extends UpgradeProcess {
 	private final FriendlyURLEntryLocalService _friendlyURLEntryLocalService;
 	private final ObjectDefinitionLocalService _objectDefinitionLocalService;
 	private final ObjectEntryLocalService _objectEntryLocalService;
+	private final ObjectFieldPersistence _objectFieldPersistence;
 
 }
