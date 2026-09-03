@@ -237,10 +237,6 @@ public class ObjectEntryDTOConverter
 			(ObjectEntryVersion)dtoConverterContext.getAttribute(
 				"objectEntryVersion");
 
-		ObjectEntryVersion creatorObjectEntryVersion =
-			_getCreatorObjectEntryVersion(
-				dtoConverterContext, objectEntryVersion);
-
 		ObjectEntry contentObjectEntry = (objectEntryVersion == null) ? null :
 			ObjectEntry.unsafeToDTO(objectEntryVersion.getContent());
 
@@ -276,6 +272,15 @@ public class ObjectEntryDTOConverter
 			() -> _toComments(objectDefinition, serviceBuilderObjectEntry));
 		objectEntry.setCreator(
 			() -> {
+				ObjectEntryVersion creatorObjectEntryVersion =
+					objectEntryVersion;
+
+				if (creatorObjectEntryVersion == null) {
+					creatorObjectEntryVersion =
+						(ObjectEntryVersion)dtoConverterContext.getAttribute(
+							"latestApprovedObjectEntryVersion");
+				}
+
 				long userId = _getAttribute(
 					creatorObjectEntryVersion,
 					ObjectEntryVersionModel::getUserId,
@@ -669,18 +674,6 @@ public class ObjectEntryDTOConverter
 
 		return serviceBuilderObjectEntryGetterFunction.apply(
 			serviceBuilderObjectEntry);
-	}
-
-	private ObjectEntryVersion _getCreatorObjectEntryVersion(
-		DTOConverterContext dtoConverterContext,
-		ObjectEntryVersion objectEntryVersion) {
-
-		if (objectEntryVersion != null) {
-			return objectEntryVersion;
-		}
-
-		return (ObjectEntryVersion)dtoConverterContext.getAttribute(
-			"latestApprovedObjectEntryVersion");
 	}
 
 	private DTOConverterContext _getDTOConverterContext(
