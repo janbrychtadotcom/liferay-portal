@@ -5,6 +5,7 @@
 
 package com.liferay.translation.service.impl;
 
+import com.liferay.asset.kernel.model.AssetEntry;
 import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.info.exception.NoSuchInfoItemException;
 import com.liferay.info.item.ClassPKInfoItemIdentifier;
@@ -29,6 +30,7 @@ import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.service.UserLocalService;
 import com.liferay.portal.kernel.service.WorkflowInstanceLinkLocalService;
 import com.liferay.portal.kernel.util.ArrayUtil;
@@ -306,6 +308,27 @@ public class TranslationEntryLocalServiceImpl
 		return translationEntryPersistence.update(translationEntry);
 	}
 
+	private void _copyAssetCategoryIdsAndAssetTagNames(
+		TranslationEntry translationEntry) {
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			return;
+		}
+
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			translationEntry.getClassName(), translationEntry.getClassPK());
+
+		if (assetEntry == null) {
+			return;
+		}
+
+		serviceContext.setAssetCategoryIds(assetEntry.getCategoryIds());
+		serviceContext.setAssetTagNames(assetEntry.getTagNames());
+	}
+
 	private void _updateInfoItem(TranslationEntry translationEntry)
 		throws PortalException {
 
@@ -322,6 +345,8 @@ public class TranslationEntryLocalServiceImpl
 					ClassPKInfoItemIdentifier.INFO_ITEM_SERVICE_FILTER);
 
 			String content = translationEntry.getContent();
+
+			_copyAssetCategoryIdsAndAssetTagNames(translationEntry);
 
 			infoItemFieldValuesUpdater.updateFromInfoItemFieldValues(
 				infoItemObjectProvider.getInfoItem(
