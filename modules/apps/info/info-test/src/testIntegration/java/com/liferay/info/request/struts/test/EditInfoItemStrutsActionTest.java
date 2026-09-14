@@ -6,6 +6,12 @@
 package com.liferay.info.request.struts.test;
 
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
+import com.liferay.asset.kernel.model.AssetCategory;
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.model.AssetVocabulary;
+import com.liferay.asset.kernel.service.AssetCategoryLocalService;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
+import com.liferay.asset.kernel.service.AssetVocabularyLocalService;
 import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.service.DLFileEntryLocalService;
 import com.liferay.info.exception.InfoFormValidationException;
@@ -27,6 +33,7 @@ import com.liferay.list.type.model.ListTypeEntry;
 import com.liferay.list.type.service.ListTypeDefinitionLocalService;
 import com.liferay.object.constants.ObjectActionKeys;
 import com.liferay.object.constants.ObjectDefinitionConstants;
+import com.liferay.object.constants.ObjectEntryFolderConstants;
 import com.liferay.object.constants.ObjectFieldConstants;
 import com.liferay.object.constants.ObjectFieldSettingConstants;
 import com.liferay.object.field.builder.AttachmentObjectFieldBuilder;
@@ -76,6 +83,7 @@ import com.liferay.portal.kernel.test.util.TestPropsValues;
 import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.upload.FileItem;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
+import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.Constants;
 import com.liferay.portal.kernel.util.DateUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -655,6 +663,71 @@ public class EditInfoItemStrutsActionTest {
 	}
 
 	@Test
+	@TestInfo("LPD-102310")
+	public void testUpdateInfoItemPreservesAssetTagNamesWhenNotSubmitted()
+		throws Exception {
+
+		AssetVocabulary assetVocabulary =
+			_assetVocabularyLocalService.addVocabulary(
+				TestPropsValues.getUserId(), _group.getGroupId(),
+				RandomTestUtil.randomString(),
+				ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		AssetCategory assetCategory = _assetCategoryLocalService.addCategory(
+			TestPropsValues.getUserId(), _group.getGroupId(),
+			RandomTestUtil.randomString(), assetVocabulary.getVocabularyId(),
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId()));
+
+		String tagName = RandomTestUtil.randomString();
+
+		ServiceContext addServiceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
+
+		addServiceContext.setAssetCategoryIds(
+			new long[] {assetCategory.getCategoryId()});
+		addServiceContext.setAssetTagNames(new String[] {tagName});
+
+		ObjectEntry objectEntry = _objectEntryLocalService.addObjectEntry(
+			0, TestPropsValues.getUserId(),
+			_objectDefinition.getObjectDefinitionId(),
+			ObjectEntryFolderConstants.PARENT_OBJECT_ENTRY_FOLDER_ID_DEFAULT,
+			LocaleUtil.toLanguageId(LocaleUtil.US),
+			HashMapBuilder.<String, Serializable>put(
+				"myText", RandomTestUtil.randomString()
+			).build(),
+			addServiceContext);
+
+		AssetEntry assetEntry = _assetEntryLocalService.getEntry(
+			_objectDefinition.getClassName(), objectEntry.getObjectEntryId());
+
+		_assertCategorizationPreserved(assetCategory, assetEntry, tagName);
+
+		_execute(
+			HashMapBuilder.<String, List<String>>put(
+				"classPK",
+				Collections.singletonList(
+					String.valueOf(objectEntry.getObjectEntryId()))
+			).build());
+
+		assetEntry = _assetEntryLocalService.getEntry(
+			_objectDefinition.getClassName(), objectEntry.getObjectEntryId());
+
+		_assertCategorizationPreserved(assetCategory, assetEntry, tagName);
+
+		_execute(
+			HashMapBuilder.<String, List<String>>put(
+				"externalReferenceCode",
+				Collections.singletonList(
+					objectEntry.getExternalReferenceCode())
+			).build());
+
+		assetEntry = _assetEntryLocalService.getEntry(
+			_objectDefinition.getClassName(), objectEntry.getObjectEntryId());
+
+		_assertCategorizationPreserved(assetCategory, assetEntry, tagName);
+	}
+
+	@Test
 	public void testUpdateInfoItemWithCheckboxNames() throws Exception {
 		MockMultipartHttpServletRequest mockMultipartHttpServletRequest =
 			new MockMultipartHttpServletRequest();
@@ -1122,6 +1195,17 @@ public class EditInfoItemStrutsActionTest {
 
 		return _objectDefinitionLocalService.publishCustomObjectDefinition(
 			_user.getUserId(), objectDefinition.getObjectDefinitionId());
+	}
+
+	private void _assertCategorizationPreserved(
+		AssetCategory assetCategory, AssetEntry assetEntry, String tagName) {
+
+		Assert.assertEquals(
+			Collections.singletonList(assetCategory.getCategoryId()),
+			Arrays.asList(ArrayUtil.toArray(assetEntry.getCategoryIds())));
+		Assert.assertEquals(
+			Collections.singletonList(tagName),
+			Arrays.asList(assetEntry.getTagNames()));
 	}
 
 	private void _assertEmptyValues(ObjectEntry objectEntry) {
@@ -1694,6 +1778,15 @@ public class EditInfoItemStrutsActionTest {
 
 		Assert.assertEquals(objectEntries.toString(), 0, objectEntries.size());
 	}
+
+	@Inject
+	private AssetCategoryLocalService _assetCategoryLocalService;
+
+	@Inject
+	private AssetEntryLocalService _assetEntryLocalService;
+
+	@Inject
+	private AssetVocabularyLocalService _assetVocabularyLocalService;
 
 	private String _classNameId;
 	private long _defaultSegmentsExperienceId;
