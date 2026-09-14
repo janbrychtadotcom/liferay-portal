@@ -5,6 +5,8 @@
 
 package com.liferay.info.internal.request.struts;
 
+import com.liferay.asset.kernel.model.AssetEntry;
+import com.liferay.asset.kernel.service.AssetEntryLocalService;
 import com.liferay.captcha.util.CaptchaUtil;
 import com.liferay.fragment.contributor.FragmentCollectionContributorRegistry;
 import com.liferay.fragment.model.FragmentEntry;
@@ -57,9 +59,12 @@ import com.liferay.portal.kernel.json.JSONObject;
 import com.liferay.portal.kernel.json.JSONUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.ClassedModel;
 import com.liferay.portal.kernel.model.Layout;
 import com.liferay.portal.kernel.security.auth.PrincipalException;
 import com.liferay.portal.kernel.service.LayoutLocalService;
+import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.service.ServiceContextThreadLocal;
 import com.liferay.portal.kernel.servlet.HttpHeaders;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
@@ -242,11 +247,17 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 				}
 
 				try {
+					Object existingInfoItem =
+						infoItemObjectProvider.getInfoItem(infoItemIdentifier);
+
+					_copyMissingAssetCategoryIdsAndAssetTagNames(
+						className, httpServletRequest, existingInfoItem,
+						infoItemIdentifier);
+
 					infoItem =
 						infoItemFieldValuesUpdater.
 							updateFromInfoItemFieldValues(
-								infoItemObjectProvider.getInfoItem(
-									infoItemIdentifier),
+								existingInfoItem,
 								InfoItemFieldValues.builder(
 								).infoFieldValues(
 									new ArrayList<>(infoFieldValues.values())
@@ -453,6 +464,66 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 	protected void activate() {
 		_infoRequestFieldValuesProviderHelper =
 			new InfoRequestFieldValuesProviderHelper(_infoItemServiceRegistry);
+	}
+
+	private void _copyMissingAssetCategoryIdsAndAssetTagNames(
+		String className, HttpServletRequest httpServletRequest,
+		Object infoItem, InfoItemIdentifier infoItemIdentifier) {
+
+		long classPK = 0;
+
+		if (infoItemIdentifier instanceof ClassPKInfoItemIdentifier) {
+			ClassPKInfoItemIdentifier classPKInfoItemIdentifier =
+				(ClassPKInfoItemIdentifier)infoItemIdentifier;
+
+			classPK = classPKInfoItemIdentifier.getClassPK();
+		}
+		else if (infoItem instanceof ClassedModel) {
+			ClassedModel classedModel = (ClassedModel)infoItem;
+
+			classPK = GetterUtil.getLong(classedModel.getPrimaryKeyObj());
+		}
+		else {
+			return;
+		}
+
+		boolean assetCategoryIdsMissing = false;
+
+		if (httpServletRequest.getParameterValues("assetCategoryIds") == null) {
+			assetCategoryIdsMissing = true;
+		}
+
+		boolean assetTagNamesMissing = false;
+
+		if (httpServletRequest.getParameterValues("assetTagNames") == null) {
+			assetTagNamesMissing = true;
+		}
+
+		if (!assetCategoryIdsMissing && !assetTagNamesMissing) {
+			return;
+		}
+
+		ServiceContext serviceContext =
+			ServiceContextThreadLocal.getServiceContext();
+
+		if (serviceContext == null) {
+			return;
+		}
+
+		AssetEntry assetEntry = _assetEntryLocalService.fetchEntry(
+			className, classPK);
+
+		if (assetEntry == null) {
+			return;
+		}
+
+		if (assetCategoryIdsMissing) {
+			serviceContext.setAssetCategoryIds(assetEntry.getCategoryIds());
+		}
+
+		if (assetTagNamesMissing) {
+			serviceContext.setAssetTagNames(assetEntry.getTagNames());
+		}
 	}
 
 	private Object _createFromInfoItemFieldValues(
@@ -796,6 +867,9 @@ public class EditInfoItemStrutsAction implements StrutsAction {
 
 	private static final Log _log = LogFactoryUtil.getLog(
 		EditInfoItemStrutsAction.class);
+
+	@Reference
+	private AssetEntryLocalService _assetEntryLocalService;
 
 	@Reference
 	private FragmentCollectionContributorRegistry
