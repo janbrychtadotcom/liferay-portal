@@ -8,18 +8,28 @@ package com.liferay.document.library.app.service.test;
 import com.liferay.arquillian.extension.junit.bridge.junit.Arquillian;
 import com.liferay.document.library.app.service.test.util.DLAppServiceTestUtil;
 import com.liferay.document.library.kernel.exception.DuplicateFileEntryException;
+import com.liferay.document.library.kernel.model.DLFileEntry;
 import com.liferay.document.library.kernel.model.DLFileEntryTypeConstants;
 import com.liferay.document.library.kernel.model.DLFolderConstants;
 import com.liferay.document.library.kernel.service.DLAppServiceUtil;
 import com.liferay.document.library.test.util.BaseDLAppTestCase;
 import com.liferay.petra.string.StringPool;
 import com.liferay.portal.kernel.model.Group;
+import com.liferay.portal.kernel.model.ResourceConstants;
+import com.liferay.portal.kernel.model.Role;
+import com.liferay.portal.kernel.model.role.RoleConstants;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
+import com.liferay.portal.kernel.security.auth.PrincipalException;
+import com.liferay.portal.kernel.security.permission.ActionKeys;
+import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
+import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.util.RandomTestUtil;
 import com.liferay.portal.kernel.test.util.ServiceContextTestUtil;
 import com.liferay.portal.kernel.test.util.TestPropsValues;
+import com.liferay.portal.kernel.test.util.UserTestUtil;
 import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.test.rule.LiferayIntegrationTestRule;
 
@@ -68,6 +78,33 @@ public class DLAppServiceWhenCopyingAFileEntryTest extends BaseDLAppTestCase {
 	@Test(expected = DuplicateFileEntryException.class)
 	public void testShouldFailIfDestinationIsSameSubfolder() throws Exception {
 		_copy(parentFolder, parentFolder);
+	}
+
+	@Test(expected = PrincipalException.class)
+	@TestInfo("LPD-110124")
+	public void testShouldFailWithNoDownloadPermission() throws Exception {
+		UserTestUtil.setUser(
+			UserTestUtil.addGroupUser(group, RoleConstants.SITE_MEMBER));
+
+		FileEntry fileEntry = DLAppServiceTestUtil.addFileEntry(
+			group.getGroupId(), parentFolder.getFolderId());
+
+		_removeResourcePermission(
+			fileEntry.getFileEntryId(), RoleConstants.OWNER,
+			ActionKeys.DOWNLOAD);
+		_removeResourcePermission(
+			fileEntry.getFileEntryId(), RoleConstants.SITE_MEMBER,
+			ActionKeys.DOWNLOAD);
+		_removeResourcePermission(
+			fileEntry.getFileEntryId(), RoleConstants.GUEST,
+			ActionKeys.DOWNLOAD);
+
+		dlAppService.copyFileEntry(
+			fileEntry.getFileEntryId(),
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			targetGroup.getGroupId(),
+			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
+			ServiceContextTestUtil.getServiceContext(targetGroup.getGroupId()));
 	}
 
 	@Test
@@ -193,6 +230,19 @@ public class DLAppServiceWhenCopyingAFileEntryTest extends BaseDLAppTestCase {
 			DLFileEntryTypeConstants.FILE_ENTRY_TYPE_ID_BASIC_DOCUMENT, null,
 			ServiceContextTestUtil.getServiceContext(
 				targetParentFolder.getGroupId()));
+	}
+
+	private void _removeResourcePermission(
+			long fileEntryId, String roleName, String actionId)
+		throws Exception {
+
+		Role role = RoleLocalServiceUtil.getRole(
+			group.getCompanyId(), roleName);
+
+		ResourcePermissionLocalServiceUtil.removeResourcePermission(
+			group.getCompanyId(), DLFileEntry.class.getName(),
+			ResourceConstants.SCOPE_INDIVIDUAL, String.valueOf(fileEntryId),
+			role.getRoleId(), actionId);
 	}
 
 }

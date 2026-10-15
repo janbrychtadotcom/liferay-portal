@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.service.ResourcePermissionLocalServiceUtil;
 import com.liferay.portal.kernel.service.RoleLocalServiceUtil;
 import com.liferay.portal.kernel.service.ServiceContext;
+import com.liferay.portal.kernel.test.TestInfo;
 import com.liferay.portal.kernel.test.rule.AggregateTestRule;
 import com.liferay.portal.kernel.test.rule.DeleteAfterTestRun;
 import com.liferay.portal.kernel.test.util.GroupTestUtil;
@@ -133,6 +134,41 @@ public class DLFileEntryServiceTest {
 
 		DLFileEntry dlFileEntry = addDLFileEntry(
 			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, true);
+
+		DLFolder destFolder = DLFolderLocalServiceUtil.addFolder(
+			null, TestPropsValues.getUserId(), _group.getGroupId(),
+			_group.getGroupId(), false,
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
+			RandomTestUtil.randomString(), RandomTestUtil.randomString(), false,
+			serviceContext);
+
+		DLFileEntryServiceUtil.copyFileEntry(
+			_group.getGroupId(), _group.getGroupId(),
+			dlFileEntry.getFileEntryId(), destFolder.getFolderId(),
+			serviceContext);
+	}
+
+	@Test(expected = PrincipalException.class)
+	@TestInfo("LPD-110124")
+	public void testCopyFileEntryWithNoDownloadPermission() throws Exception {
+		UserTestUtil.setUser(
+			UserTestUtil.addGroupUser(_group, RoleConstants.SITE_MEMBER));
+
+		DLFileEntry dlFileEntry = addDLFileEntry(
+			DLFolderConstants.DEFAULT_PARENT_FOLDER_ID, false);
+
+		_removeResourcePermission(
+			dlFileEntry.getFileEntryId(), RoleConstants.OWNER,
+			ActionKeys.DOWNLOAD);
+		_removeResourcePermission(
+			dlFileEntry.getFileEntryId(), RoleConstants.SITE_MEMBER,
+			ActionKeys.DOWNLOAD);
+		_removeResourcePermission(
+			dlFileEntry.getFileEntryId(), RoleConstants.GUEST,
+			ActionKeys.DOWNLOAD);
+
+		ServiceContext serviceContext =
+			ServiceContextTestUtil.getServiceContext(_group.getGroupId());
 
 		DLFolder destFolder = DLFolderLocalServiceUtil.addFolder(
 			null, TestPropsValues.getUserId(), _group.getGroupId(),
